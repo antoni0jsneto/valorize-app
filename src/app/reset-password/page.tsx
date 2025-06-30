@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
@@ -48,39 +49,52 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md p-6">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl">
-            Redefinir Senha
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Nova senha</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Confirmar senha</label>
-              <Input
-                type="password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Redefinindo..." : "Redefinir Senha"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <>
+      <div className="relative">
+        <div className="absolute top-2 left-2">
+          <Link href="/">
+            <h1 className="text-xl font-bold tracking-tight text-emerald-600 whitespace-nowrap">
+              Valorize
+              <span className="text-emerald-500 font-extrabold">App</span>
+            </h1>
+          </Link>
+        </div>
+      </div>
+
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-2">
+        <Card className="w-full max-w-md p-6">
+          <CardHeader>
+            <CardTitle className="text-center text-2xl">
+              Redefinir Senha
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Nova senha</label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Confirmar senha</label>
+                <Input
+                  type="password"
+                  value={confirm}
+                  onChange={(e) => setConfirm(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Redefinindo..." : "Redefinir Senha"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </>
   );
 }

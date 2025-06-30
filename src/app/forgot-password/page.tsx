@@ -56,42 +56,56 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md p-6">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl">
-            Esqueceu sua senha?
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-muted-foreground mb-6">
-            Digite seu e-mail e enviaremos instruções para redefinir sua senha.
-          </p>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">E-mail</label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="seu@email.com"
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Enviando..." : "Enviar instruções"}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <Link
-            href="/login"
-            className="text-sm text-muted-foreground hover:text-primary"
-          >
-            Voltar para o login
+    <>
+      <div className="relative">
+        <div className="absolute top-2 left-2">
+          <Link href="/">
+            <h1 className="text-xl font-bold tracking-tight text-emerald-600 whitespace-nowrap">
+              Valorize
+              <span className="text-emerald-500 font-extrabold">App</span>
+            </h1>
           </Link>
-        </CardFooter>
-      </Card>
-    </div>
+        </div>
+      </div>
+
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-2">
+        <Card className="w-full max-w-md p-6">
+          <CardHeader>
+            <CardTitle className="text-center text-2xl">
+              Esqueceu sua senha?
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-center text-muted-foreground mb-6">
+              Digite seu e-mail e enviaremos instruções para redefinir sua
+              senha.
+            </p>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">E-mail</label>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seu@email.com"
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Enviando..." : "Enviar instruções"}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            <Link
+              href="/login"
+              className="text-sm text-muted-foreground hover:text-primary"
+            >
+              Voltar para o login
+            </Link>
+          </CardFooter>
+        </Card>
+      </div>
+    </>
   );
 }

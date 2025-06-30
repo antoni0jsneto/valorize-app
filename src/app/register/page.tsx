@@ -124,125 +124,138 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md p-6">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl">Criar Conta</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleSignIn}
-          >
-            <FcGoogle className="mr-2 h-5 w-5" />
-            Continuar com Google
-          </Button>
+    <>
+      <div className="relative">
+        <div className="absolute top-2 left-2">
+          <Link href="/">
+            <h1 className="text-xl font-bold tracking-tight text-emerald-600 whitespace-nowrap">
+              Valorize
+              <span className="text-emerald-500 font-extrabold">App</span>
+            </h1>
+          </Link>
+        </div>
+      </div>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <Separator />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-gray-50 px-2 text-muted-foreground">
-                Ou cadastre-se com e-mail
-              </span>
-            </div>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-2">
+        <Card className="w-full max-w-md p-6">
+          <CardHeader>
+            <CardTitle className="text-center text-2xl">Criar Conta</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogleSignIn}
+            >
+              <FcGoogle className="mr-2 h-5 w-5" />
+              Continuar com Google
+            </Button>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex flex-col items-center gap-4">
-              <div className="relative">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage src={imageUrl} />
-                  <AvatarFallback>
-                    {formData.name ? formData.name[0].toUpperCase() : "?"}
-                  </AvatarFallback>
-                </Avatar>
-                {imageUrl && (
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <Separator />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-gray-50 px-2 text-muted-foreground">
+                  Ou cadastre-se com e-mail
+                </span>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative">
+                  <Avatar className="h-24 w-24">
+                    <AvatarImage src={imageUrl} />
+                    <AvatarFallback>
+                      {formData.name ? formData.name[0].toUpperCase() : "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                  {imageUrl && (
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                      onClick={handleRemoveImage}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileChange}
+                    ref={fileInputRef}
+                  />
                   <Button
                     type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                    onClick={handleRemoveImage}
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
                   >
-                    <X className="h-4 w-4" />
+                    <Upload className="mr-2 h-4 w-4" />
+                    Escolher foto
                   </Button>
-                )}
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileChange}
-                  ref={fileInputRef}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  Escolher foto
-                </Button>
-              </div>
-            </div>
 
-            <div>
-              <label className="text-sm font-medium">Nome</label>
-              <Input
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">E-mail</label>
-              <Input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Senha</label>
-              <Input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Confirmar Senha</label>
-              <Input
-                type="password"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Cadastrando..." : "Cadastrar"}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <span className="text-sm text-muted-foreground">
-            Já tem uma conta?{" "}
-            <Link href="/login" className="text-primary hover:underline">
-              Faça login
-            </Link>
-          </span>
-        </CardFooter>
-      </Card>
-    </div>
+              <div>
+                <label className="text-sm font-medium">Nome</label>
+                <Input
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">E-mail</label>
+                <Input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Senha</label>
+                <Input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Confirmar Senha</label>
+                <Input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Cadastrando..." : "Cadastrar"}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            <span className="text-sm text-muted-foreground">
+              Já tem uma conta?{" "}
+              <Link href="/login" className="text-primary hover:underline">
+                Faça login
+              </Link>
+            </span>
+          </CardFooter>
+        </Card>
+      </div>
+    </>
   );
 }

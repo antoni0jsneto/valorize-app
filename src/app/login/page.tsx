@@ -86,96 +86,109 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md p-6">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl">
-            Entrar no Valorize
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium">Email</label>
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium">Senha</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <div className="text-right">
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-primary hover:underline"
-                >
-                  Esqueceu sua senha?
-                </Link>
+    <>
+      <div className="relative">
+        <div className="absolute top-2 left-2">
+          <Link href="/">
+            <h1 className="text-xl font-bold tracking-tight text-emerald-600 whitespace-nowrap">
+              Valorize
+              <span className="text-emerald-500 font-extrabold">App</span>
+            </h1>
+          </Link>
+        </div>
+      </div>
+
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-2">
+        <Card className="w-full max-w-md p-6">
+          <CardHeader>
+            <CardTitle className="text-center text-2xl">
+              Entrar no Valorize
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Email</label>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium">Senha</label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <div className="text-right">
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Esqueceu sua senha?
+                  </Link>
+                </div>
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Entrando...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <IoMdLogIn className="w-4 h-4 mr-2" />
+                    Entrar
+                  </div>
+                )}
+              </Button>
+            </form>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">
+                  Ou continue com
+                </span>
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogleLogin}
+              disabled={googleLoading}
+            >
+              {googleLoading ? (
                 <div className="flex items-center justify-center">
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Entrando...
+                  Conectando com Google...
                 </div>
               ) : (
-                <div className="flex items-center justify-center">
-                  <IoMdLogIn className="w-4 h-4 mr-2" />
-                  Entrar
-                </div>
+                <>
+                  <FcGoogle className="mr-2" />
+                  Entrar com Google
+                </>
               )}
             </Button>
-          </form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
-                Ou continue com
-              </span>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleLogin}
-            disabled={googleLoading}
-          >
-            {googleLoading ? (
-              <div className="flex items-center justify-center">
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Conectando com Google...
-              </div>
-            ) : (
-              <>
-                <FcGoogle className="mr-2" />
-                Entrar com Google
-              </>
-            )}
-          </Button>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <span className="text-sm text-muted-foreground">
-            Não tem uma conta?{" "}
-            <Link href="/register" className="text-primary hover:underline">
-              Cadastre-se
-            </Link>
-          </span>
-        </CardFooter>
-      </Card>
-    </div>
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            <span className="text-sm text-muted-foreground">
+              Não tem uma conta?{" "}
+              <Link href="/register" className="text-primary hover:underline">
+                Cadastre-se
+              </Link>
+            </span>
+          </CardFooter>
+        </Card>
+      </div>
+    </>
   );
 }
