@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { IoMdLogIn } from "react-icons/io";
 import { Loader2 } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import Loading from "@/components/loading";
 
 export default function LoginPage() {
   const { status } = useSession();
@@ -35,11 +36,7 @@ export default function LoginPage() {
   }, [status, router]);
 
   if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin" />
-      </div>
-    );
+    return <Loading />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
