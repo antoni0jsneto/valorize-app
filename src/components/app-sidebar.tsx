@@ -48,11 +48,13 @@ import {
   BellDot,
 } from "lucide-react";
 import { FaChartPie } from "react-icons/fa";
+import { useSession } from "next-auth/react";
 
 export function AppSidebar() {
   const [expanded, setExpanded] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [hasNotifications] = useState(true);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -236,12 +238,14 @@ export function AppSidebar() {
                     `}
                   >
                     <Avatar className="h-6 w-6">
-                      <AvatarImage src="" />
+                      <AvatarImage src={session?.user?.image || ""} />
                       <AvatarFallback>UN</AvatarFallback>
                     </Avatar>
                     {(expanded || isMobile) && (
                       <div className="flex flex-col items-start flex-1">
-                        <span className="text-sm font-medium">Usuário</span>
+                        <span className="text-sm font-medium">
+                          {session?.user?.name || "Usuário"}
+                        </span>
                       </div>
                     )}
                   </Button>
