@@ -48,7 +48,7 @@ import {
   BellDot,
 } from "lucide-react";
 import { FaChartPie } from "react-icons/fa";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 export function AppSidebar() {
   const [expanded, setExpanded] = useState(true);
@@ -264,7 +264,10 @@ export function AppSidebar() {
                 <User size={18} />
                 <span>Perfil</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="gap-2 text-red-600">
+              <DropdownMenuItem
+                className="gap-2 text-red-600"
+                onClick={handleLogout}
+              >
                 <LogOut size={18} />
                 <span>Sair</span>
               </DropdownMenuItem>
@@ -274,6 +277,10 @@ export function AppSidebar() {
       </div>
     </div>
   );
+
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+  };
 
   return (
     <>
