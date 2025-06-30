@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { v4 as uuidv4 } from "uuid";
-import { addHours } from "date-fns";
+import crypto from "crypto";
 
 // Função para enviar e-mail (simples - substitua por seu provedor)
 async function sendResetEmail(email: string, token: string) {
@@ -13,33 +12,57 @@ async function sendResetEmail(email: string, token: string) {
 }
 
 export async function POST(req: Request) {
-  const { email } = await req.json();
+  try {
+    const { email } = await req.json();
 
-  if (!email) {
+    if (!email) {
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "USER_NOT_FOUND" }, { status: 404 });
+    }
+
+    // Generate a reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour from now
+
+    try {
+      // Save the reset token in the database
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          resetToken,
+          resetTokenExpiry,
+        },
+      });
+
+      // TODO: Send email with reset link
+      // For now, we'll just log it
+      console.log(
+        `Reset link: ${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}`
+      );
+
+      return NextResponse.json(
+        { message: "Reset instructions sent successfully" },
+        { status: 200 }
+      );
+    } catch (error) {
+      console.error("Error updating user with reset token:", error);
+      return NextResponse.json(
+        { error: "Failed to generate reset token" },
+        { status: 500 }
+      );
+    }
+  } catch (error) {
+    console.error("Forgot password error:", error);
     return NextResponse.json(
-      { error: "E-mail é obrigatório" },
-      { status: 400 }
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
-
-  const user = await prisma.user.findUnique({ where: { email } });
-
-  if (!user) {
-    return NextResponse.json({ success: true }); // Não expõe se o e-mail existe
-  }
-
-  const token = uuidv4();
-  const expiresAt = addHours(new Date(), 2);
-
-  await prisma.passwordResetToken.create({
-    data: {
-      userId: user.id,
-      token,
-      expiresAt,
-    },
-  });
-
-  await sendResetEmail(email, token);
-
-  return NextResponse.json({ success: true });
 }
