@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, email, password, image } = await req.json();
 
     // Validate required fields
     if (!name || !email || !password) {
@@ -49,11 +49,13 @@ export async function POST(req: Request) {
         name,
         email,
         password: hashedPassword,
+        image,
       },
       select: {
         id: true,
         name: true,
         email: true,
+        image: true,
         createdAt: true,
         updatedAt: true,
       },

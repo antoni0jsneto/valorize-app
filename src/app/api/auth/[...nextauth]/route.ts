@@ -42,6 +42,13 @@ const handler = NextAuth({
       async authorize(credentials) {
         const user = await prisma.user.findUnique({
           where: { email: credentials?.email },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            password: true,
+            image: true,
+          },
         });
         if (!user || !user.password) return null;
 
@@ -55,7 +62,7 @@ const handler = NextAuth({
     error: "/login", // Error code passed in query string as ?error=
   },
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
+    async signIn({ user, account, profile }) {
       console.log("Sign in callback", { user, account, profile });
       return true;
     },
@@ -63,17 +70,21 @@ const handler = NextAuth({
       console.log("Redirect callback", { url, baseUrl });
       return url.startsWith(baseUrl) ? url : baseUrl + "/dashboard";
     },
-    async session({ session, token, user }) {
-      console.log("Session callback", { session, token, user });
+    async session({ session, token }) {
+      console.log("Session callback", { session, token });
       if (token?.sub) {
         session.user.id = token.sub;
       }
+      if (token.image) {
+        session.user.image = token.image as string;
+      }
       return session;
     },
-    async jwt({ token, user, account, profile }) {
-      console.log("JWT callback", { token, user, account, profile });
+    async jwt({ token, user }) {
+      console.log("JWT callback", { token, user });
       if (user) {
         token.sub = user.id;
+        token.image = user.image;
       }
       return token;
     },
@@ -84,9 +95,6 @@ const handler = NextAuth({
     },
     async signOut(message) {
       console.log("User signed out", message);
-    },
-    async error(message) {
-      console.error("AuthJS error:", message);
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
@@ -16,10 +16,14 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { FcGoogle } from "react-icons/fc";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { X, Upload } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -30,6 +34,43 @@ export default function RegisterPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setImageUrl(data.url);
+        toast.success("Imagem enviada com sucesso!");
+      } else {
+        toast.error(data.error || "Erro ao fazer upload da imagem");
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(`Erro ao fazer upload da imagem: ${error.message}`);
+      } else {
+        toast.error("Erro ao fazer upload da imagem");
+      }
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageUrl("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,6 +90,7 @@ export default function RegisterPage() {
           name: formData.name,
           email: formData.email,
           password: formData.password,
+          image: imageUrl,
         }),
       });
 
@@ -109,6 +151,45 @@ export default function RegisterPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src={imageUrl} />
+                  <AvatarFallback>
+                    {formData.name ? formData.name[0].toUpperCase() : "?"}
+                  </AvatarFallback>
+                </Avatar>
+                {imageUrl && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                    onClick={handleRemoveImage}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  ref={fileInputRef}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Escolher foto
+                </Button>
+              </div>
+            </div>
+
             <div>
               <label className="text-sm font-medium">Nome</label>
               <Input
