@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
-import { AppSidebar } from "@/components/app-sidebar";
 import "./globals.css";
+import { AuthProvider } from "@/components/providers/auth-provider";
+import { ToasterProvider } from "@/components/providers/toaster-provider";
 
 export const metadata: Metadata = {
   title: "Valorize: Controle suas finanças pessoais e empresariais",
@@ -17,14 +18,10 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={GeistSans.className}>
       <body className="antialiased bg-gray-50">
-        <div className="flex min-h-screen">
-          <AppSidebar />
-          <main className="flex-1">
-            <div className="container mx-auto p-4 pt-20 md:pt-3">
-              {children}
-            </div>
-          </main>
-        </div>
+        <AuthProvider>
+          {children}
+          <ToasterProvider />
+        </AuthProvider>
       </body>
     </html>
   );
