@@ -2,10 +2,17 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 import { signIn, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 import { IoMdLogIn } from "react-icons/io";
 import { Loader2 } from "lucide-react";
@@ -97,7 +104,7 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <div>
+            <div className="space-y-1">
               <label className="text-sm font-medium">Senha</label>
               <Input
                 type="password"
@@ -105,6 +112,14 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <div className="text-right">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-primary hover:underline"
+                >
+                  Esqueceu sua senha?
+                </Link>
+              </div>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
@@ -119,35 +134,47 @@ export default function LoginPage() {
                 </div>
               )}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={handleGoogleLogin}
-              disabled={googleLoading}
-            >
-              {googleLoading ? (
-                <div className="flex items-center justify-center">
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Conectando com Google...
-                </div>
-              ) : (
-                <>
-                  <FcGoogle className="mr-2" />
-                  Entrar com Google
-                </>
-              )}
-            </Button>
-            <div className="text-sm text-center">
-              <a
-                href="/reset-password"
-                className="text-blue-600 hover:underline"
-              >
-                Esqueci minha senha
-              </a>
-            </div>
           </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">
+                Ou continue com
+              </span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={handleGoogleLogin}
+            disabled={googleLoading}
+          >
+            {googleLoading ? (
+              <div className="flex items-center justify-center">
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Conectando com Google...
+              </div>
+            ) : (
+              <>
+                <FcGoogle className="mr-2" />
+                Entrar com Google
+              </>
+            )}
+          </Button>
         </CardContent>
+        <CardFooter className="flex justify-center">
+          <span className="text-sm text-muted-foreground">
+            Não tem uma conta?{" "}
+            <Link href="/register" className="text-primary hover:underline">
+              Cadastre-se
+            </Link>
+          </span>
+        </CardFooter>
       </Card>
     </div>
   );
