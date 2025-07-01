@@ -7,12 +7,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -26,7 +20,6 @@ import {
   Receipt,
   FileBarChart,
   Wallet,
-  Settings,
   Bell,
   Tags,
   CreditCard,
@@ -41,6 +34,14 @@ import { FaChartPie } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LucideIcon } from "lucide-react";
+
+interface MenuItem {
+  label: string;
+  icon: LucideIcon;
+  href: string;
+  type?: "separator";
+}
 
 export function AppSidebar() {
   const [expanded, setExpanded] = useState(true);
@@ -48,6 +49,17 @@ export function AppSidebar() {
   const [hasNotifications] = useState(true);
   const { data: session } = useSession();
   const pathname = usePathname();
+
+  const isMenuItemActive = (href: string) => {
+    if (
+      href === "/settings/accounts" ||
+      href === "/settings/credit-cards" ||
+      href === "/settings/categories"
+    ) {
+      return pathname === href;
+    }
+    return pathname === href;
+  };
 
   useEffect(() => {
     const checkMobile = () => {
@@ -62,21 +74,20 @@ export function AppSidebar() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     { label: "Visão Geral", icon: PieChart, href: "/dashboard" },
     { label: "Lançamentos", icon: Receipt, href: "/dashboard/transactions" },
     { label: "Relatórios", icon: FileBarChart, href: "/dashboard/reports" },
     { label: "Limite de Gastos", icon: Wallet, href: "/dashboard/limits" },
-  ];
-
-  const settingsItems = [
-    { label: "Categorias", icon: FolderTree, href: "/settings/categories" },
+    { label: "", icon: PieChart, href: "", type: "separator" },
     { label: "Contas", icon: Wallet, href: "/settings/accounts" },
     {
       label: "Cartões de Crédito",
       icon: CreditCard,
       href: "/settings/credit-cards",
     },
+    { label: "Categorias", icon: FolderTree, href: "/settings/categories" },
+    { label: "", icon: PieChart, href: "", type: "separator" },
     { label: "Preferências", icon: Sliders, href: "/settings/preferences" },
     { label: "Meu Plano", icon: Heart, href: "/settings/plan" },
     { label: "Tags", icon: Tags, href: "/settings/tags" },
@@ -131,79 +142,43 @@ export function AppSidebar() {
         <TooltipProvider>
           {/* Main Menu */}
           <div className="space-y-2 py-4">
-            {menuItems.map((item) => (
-              <Tooltip key={item.label}>
-                <TooltipTrigger asChild>
-                  <Link href={item.href}>
-                    <Button
-                      variant={pathname === item.href ? "default" : "ghost"}
-                      className={`
-                        w-full relative hover:bg-gray-100
-                        ${
-                          expanded
-                            ? "justify-start gap-3"
-                            : "justify-center p-2"
-                        }
-                        ${isMobile && "justify-start gap-3"}
-                      `}
-                    >
-                      <item.icon size={22} />
-                      {(expanded || isMobile) && <span>{item.label}</span>}
-                    </Button>
-                  </Link>
-                </TooltipTrigger>
-                {!expanded && !isMobile && (
-                  <TooltipContent side="right" sideOffset={10}>
-                    {item.label}
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            ))}
+            {menuItems.map((item, index) => {
+              if (item.type === "separator") {
+                return <Separator key={index} className="my-4" />;
+              }
 
-            {/* Settings Dropdown */}
-            <DropdownMenu>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant={
-                        pathname.startsWith("/settings") ? "green" : "ghost"
-                      }
-                      className={`
-                        w-full relative hover:bg-gray-100
-                        ${
-                          expanded
-                            ? "justify-start gap-3"
-                            : "justify-center p-2"
+              const Icon = item.icon;
+              return (
+                <Tooltip key={item.label}>
+                  <TooltipTrigger asChild>
+                    <Link href={item.href}>
+                      <Button
+                        variant={
+                          isMenuItemActive(item.href) ? "green" : "ghost"
                         }
-                        ${isMobile && "justify-start gap-3"}
-                      `}
-                    >
-                      <Settings size={22} />
-                      {(expanded || isMobile) && <span>Configurações</span>}
-                    </Button>
-                  </DropdownMenuTrigger>
-                </TooltipTrigger>
-                {!expanded && !isMobile && (
-                  <TooltipContent side="right" sideOffset={10}>
-                    Configurações
-                  </TooltipContent>
-                )}
-              </Tooltip>
-              <DropdownMenuContent className="w-56" align="start" side="right">
-                {settingsItems.map((item) => (
-                  <DropdownMenuItem key={item.label} asChild>
-                    <Link
-                      href={item.href}
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <item.icon size={18} />
-                      <span>{item.label}</span>
+                        className={`
+                          w-full relative hover:bg-gray-100
+                          ${
+                            expanded
+                              ? "justify-start gap-3"
+                              : "justify-center p-2"
+                          }
+                          ${isMobile && "justify-start gap-3"}
+                        `}
+                      >
+                        <Icon size={22} />
+                        {(expanded || isMobile) && <span>{item.label}</span>}
+                      </Button>
                     </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  </TooltipTrigger>
+                  {!expanded && !isMobile && (
+                    <TooltipContent side="right" sideOffset={10}>
+                      {item.label}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              );
+            })}
           </div>
 
           <Separator className="my-4" />
