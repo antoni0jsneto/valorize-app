@@ -18,6 +18,7 @@ model User {
   resetTokenExpiry  DateTime?
   accounts          Account[]
   sessions          Session[]
+  categories        Category[]
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 }
@@ -61,4 +62,37 @@ model PasswordResetToken {
   token      String   @unique
   expiresAt  DateTime
   createdAt  DateTime @default(now())
+}
+
+model Category {
+  id            String        @id @default(uuid())
+  name          String
+  icon          String
+  color         String
+  type          String
+  isArchived    Boolean       @default(false)
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subcategories SubCategory[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@unique([name, userId, type])
+}
+
+model SubCategory {
+  id         String   @id @default(uuid())
+  name       String
+  isArchived Boolean  @default(false)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([name, categoryId])
+}
+
+enum CategoryType {
+  EXPENSE
+  INCOME
 }

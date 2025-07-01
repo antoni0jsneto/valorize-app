@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Protected routes - must be authenticated
-  if (path.startsWith("/dashboard")) {
+  if (path.startsWith("/dashboard") || path.startsWith("/settings")) {
     if (!isAuthenticated) {
       const url = new URL("/login", request.url);
       url.searchParams.set("callbackUrl", path);
@@ -30,5 +30,5 @@ export async function middleware(request: NextRequest) {
 
 // Configure which routes to run middleware on
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ["/dashboard/:path*", "/settings/:path*", "/login"],
 };
