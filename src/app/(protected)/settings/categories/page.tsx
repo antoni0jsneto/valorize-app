@@ -2,6 +2,14 @@
 
 import { CategoryList } from "@/components/categories/category-list";
 import Loading from "@/components/loading";
+import {
+  PageContainer,
+  PageContent,
+  PageDescription,
+  PageHeader,
+  PageHeaderContent,
+  PageTitle,
+} from "@/components/page-container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
@@ -125,39 +133,47 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className="container mx-auto py-6">
-      <Tabs defaultValue="expense">
-        <TabsList className="flex">
-          <TabsTrigger className="flex-1 cursor-pointer" value="expense">
-            Despesas
-          </TabsTrigger>
-          <TabsTrigger className="flex-1 cursor-pointer" value="income">
-            Receitas
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="expense" className="mt-6">
-          <CategoryList
-            type="EXPENSE"
-            categories={expenseCategories}
-            onCreateCategory={(data) => handleCreateCategory("EXPENSE", data)}
-            onEditCategory={(id, data) =>
-              handleEditCategory("EXPENSE", id, data)
-            }
-            onCreateSubcategory={handleCreateSubcategory}
-          />
-        </TabsContent>
-        <TabsContent value="income" className="mt-6">
-          <CategoryList
-            type="INCOME"
-            categories={incomeCategories}
-            onCreateCategory={(data) => handleCreateCategory("INCOME", data)}
-            onEditCategory={(id, data) =>
-              handleEditCategory("INCOME", id, data)
-            }
-            onCreateSubcategory={handleCreateSubcategory}
-          />
-        </TabsContent>
-      </Tabs>
-    </div>
+    <PageContainer>
+      <PageHeader>
+        <PageHeaderContent>
+          <PageTitle>Categorias</PageTitle>
+          <PageDescription>Gerencie suas categorias</PageDescription>
+        </PageHeaderContent>
+      </PageHeader>
+      <PageContent>
+        <Tabs defaultValue="expense">
+          <TabsList className="flex">
+            <TabsTrigger className="flex-1 cursor-pointer" value="expense">
+              Despesas
+            </TabsTrigger>
+            <TabsTrigger className="flex-1 cursor-pointer" value="income">
+              Receitas
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="expense" className="mt-6">
+            <CategoryList
+              type="EXPENSE"
+              categories={expenseCategories}
+              onCreateCategory={(data) => handleCreateCategory("EXPENSE", data)}
+              onEditCategory={(id, data) =>
+                handleEditCategory("EXPENSE", id, data)
+              }
+              onCreateSubcategory={handleCreateSubcategory}
+            />
+          </TabsContent>
+          <TabsContent value="income" className="mt-6">
+            <CategoryList
+              type="INCOME"
+              categories={incomeCategories}
+              onCreateCategory={(data) => handleCreateCategory("INCOME", data)}
+              onEditCategory={(id, data) =>
+                handleEditCategory("INCOME", id, data)
+              }
+              onCreateSubcategory={handleCreateSubcategory}
+            />
+          </TabsContent>
+        </Tabs>
+      </PageContent>
+    </PageContainer>
   );
 }
