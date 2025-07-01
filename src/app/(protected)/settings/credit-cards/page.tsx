@@ -71,7 +71,15 @@ export default async function CreditCardsPage() {
         </PageActions>
       </PageHeader>
       <PageContent>
-        <CreditCardList cards={creditCards} />
+        {creditCards.length > 0 ? (
+          <CreditCardList cards={creditCards} />
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full">
+            <p className="text-sm text-gray-500">
+              Nenhum cartão de crédito cadastrado
+            </p>
+          </div>
+        )}
       </PageContent>
     </PageContainer>
   );
