@@ -29,9 +29,10 @@ import {
   Sliders,
   FolderTree,
   BellDot,
+  LogOut,
 } from "lucide-react";
 import { FaChartPie } from "react-icons/fa";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LucideIcon } from "lucide-react";
@@ -99,7 +100,7 @@ export function AppSidebar() {
     <div
       className={`h-screen flex flex-col ${
         isMobile ? "w-full" : expanded ? "w-64" : "w-20"
-      } bg-white border-r shadow-sm`}
+      } bg-white border-r shadow-sm rounded-r-md`}
     >
       {/* Logo Section */}
       <div
@@ -217,14 +218,19 @@ export function AppSidebar() {
             </AvatarFallback>
           </Avatar>
           {(expanded || isMobile) && (
-            <div className="flex-1 overflow-hidden">
-              <h4 className="text-sm font-medium truncate">
-                {session?.user?.name}
-              </h4>
-              <p className="text-xs text-gray-500 truncate">
-                {session?.user?.email}
-              </p>
-            </div>
+            <>
+              <div className="flex-1 overflow-hidden">
+                <h4 className="text-sm font-medium truncate">
+                  {session?.user?.name}
+                </h4>
+                <p className="text-xs text-gray-500 truncate">
+                  {session?.user?.email}
+                </p>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => signOut()}>
+                <LogOut color="red" size={20} />
+              </Button>
+            </>
           )}
         </div>
       </div>
