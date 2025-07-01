@@ -11,6 +11,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Verify if user exists
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     const type = request.nextUrl.searchParams.get("type") as CategoryType;
     const where = type
       ? { type, userId: session.user.id }
@@ -29,28 +38,44 @@ export async function GET(request: NextRequest) {
 
     // If user has no categories, create default ones
     if (categories.length === 0) {
-      const defaultCategoriesData = defaultCategories.map((category) => ({
-        name: category.name,
-        icon: category.icon,
-        color: category.color,
-        type: category.type,
-        userId: session.user.id,
-      }));
+      try {
+        // Create categories one by one to avoid unique constraint issues
+        for (const category of defaultCategories) {
+          try {
+            await prisma.category.create({
+              data: {
+                name: category.name,
+                icon: category.icon,
+                color: category.color,
+                type: category.type,
+                userId: session.user.id,
+              },
+            });
+          } catch (error) {
+            console.error(`Error creating category ${category.name}:`, error);
+            // Continue with the next category if this one fails
+            continue;
+          }
+        }
 
-      await prisma.category.createMany({
-        data: defaultCategoriesData,
-      });
-
-      categories = await prisma.category.findMany({
-        where,
-        orderBy: { name: "asc" },
-        include: {
-          subcategories: {
-            where: { isArchived: false },
-            orderBy: { name: "asc" },
+        // Fetch all categories again after creation
+        categories = await prisma.category.findMany({
+          where,
+          orderBy: { name: "asc" },
+          include: {
+            subcategories: {
+              where: { isArchived: false },
+              orderBy: { name: "asc" },
+            },
           },
-        },
-      });
+        });
+      } catch (error) {
+        console.error("Error creating default categories:", error);
+        return NextResponse.json(
+          { error: "Error creating default categories" },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json(categories);
