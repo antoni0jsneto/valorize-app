@@ -62,16 +62,13 @@ const handler = NextAuth({
     error: "/login", // Error code passed in query string as ?error=
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
-      console.log("Sign in callback", { user, account, profile });
+    async signIn() {
       return true;
     },
     async redirect({ url, baseUrl }) {
-      console.log("Redirect callback", { url, baseUrl });
       return url.startsWith(baseUrl) ? url : baseUrl + "/dashboard";
     },
     async session({ session, token }) {
-      console.log("Session callback", { session, token });
       if (token?.sub) {
         session.user.id = token.sub;
       }
@@ -81,7 +78,6 @@ const handler = NextAuth({
       return session;
     },
     async jwt({ token, user }) {
-      console.log("JWT callback", { token, user });
       if (user) {
         token.sub = user.id;
         token.image = user.image;

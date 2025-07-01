@@ -50,6 +50,8 @@ React/Next.js
 - Sempre use a biblioteca "react-number-format" ao criar máscaras para inputs.
 - Sempre que possível, respeite a hierarquia da /src para criar pastas e arquivos.
 
+Sempre que eu pedir para você implementar algo, me explique detalhadamente tudo que fez para eu ir aprendendo.
+
 
 
 
