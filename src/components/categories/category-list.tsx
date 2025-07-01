@@ -53,7 +53,7 @@ export function CategoryList({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-md md:text-2xl font-bold">
+        <h2 className="text-md md:text-lg font-bold">
           Categorias de {type === "EXPENSE" ? "Despesa" : "Receita"}
         </h2>
         <CategoryDialog
