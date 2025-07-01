@@ -144,25 +144,25 @@ export const defaultCategories = [
   {
     name: "Empréstimos",
     icon: "credit-card",
-    color: "#4CAF50",
+    color: "#26c498",
     type: CategoryType.INCOME,
   },
   {
     name: "Investimentos",
     icon: "trending-up",
-    color: "#8BC34A",
+    color: "#26c498",
     type: CategoryType.INCOME,
   },
   {
     name: "Outras receitas",
     icon: "dollar-sign",
-    color: "#CDDC39",
+    color: "#26c498",
     type: CategoryType.INCOME,
   },
   {
     name: "Salário",
     icon: "wallet",
-    color: "#FFC107",
+    color: "#26c498",
     type: CategoryType.INCOME,
   },
 ];
