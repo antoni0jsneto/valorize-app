@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { BankAccountDialog } from "@/components/bank-accounts/bank-account-dialog";
 import { BankAccountList } from "@/components/bank-accounts/bank-account-list";
 import { Plus } from "lucide-react";
+import {
+  PageActions,
+  PageContainer,
+  PageContent,
+  PageHeader,
+  PageHeaderContent,
+} from "@/components/page-container";
 
 export default async function AccountsPage() {
   const session = await getServerSession(authOptions);
@@ -27,23 +34,27 @@ export default async function AccountsPage() {
     });
 
     return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
+      <PageContainer>
+        <PageHeader>
+          <PageHeaderContent>
             <h2 className="text-2xl font-bold tracking-tight">Contas</h2>
             <p className="text-muted-foreground">
               Gerencie suas contas bancárias e carteiras
             </p>
-          </div>
-          <BankAccountDialog>
-            <Button>
-              <Plus className="h-4 w-4" />
-              Nova Conta
-            </Button>
-          </BankAccountDialog>
-        </div>
-        <BankAccountList accounts={accounts} />
-      </div>
+          </PageHeaderContent>
+          <PageActions>
+            <BankAccountDialog>
+              <Button>
+                <Plus className="h-4 w-4" />
+                Nova Conta
+              </Button>
+            </BankAccountDialog>
+          </PageActions>
+        </PageHeader>
+        <PageContent>
+          <BankAccountList accounts={accounts} />
+        </PageContent>
+      </PageContainer>
     );
   } catch (error) {
     console.error("[ACCOUNTS_PAGE]", error);
