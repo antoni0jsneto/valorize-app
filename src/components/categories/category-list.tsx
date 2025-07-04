@@ -58,9 +58,9 @@ export function CategoryList({
         </h2>
         <CategoryDialog
           trigger={
-            <Button>
+            <Button size="sm" variant="blue">
               <Plus className="h-4 w-4" />
-              Nova Categoria
+              Nova {type === "EXPENSE" ? "despesa" : "receita"}
             </Button>
           }
           type={type}

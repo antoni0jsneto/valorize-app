@@ -10,8 +10,10 @@ import {
   PageActions,
   PageContainer,
   PageContent,
+  PageDescription,
   PageHeader,
   PageHeaderContent,
+  PageTitle,
 } from "@/components/page-container";
 
 export default async function AccountsPage() {
@@ -37,14 +39,14 @@ export default async function AccountsPage() {
       <PageContainer>
         <PageHeader>
           <PageHeaderContent>
-            <h2 className="text-2xl font-bold tracking-tight">Contas</h2>
-            <p className="text-muted-foreground">
+            <PageTitle>Contas</PageTitle>
+            <PageDescription>
               Gerencie suas contas bancárias e carteiras
-            </p>
+            </PageDescription>
           </PageHeaderContent>
           <PageActions>
             <BankAccountDialog>
-              <Button>
+              <Button size="sm" variant="blue">
                 <Plus className="h-4 w-4" />
                 Nova Conta
               </Button>
@@ -52,7 +54,13 @@ export default async function AccountsPage() {
           </PageActions>
         </PageHeader>
         <PageContent>
-          <BankAccountList accounts={accounts} />
+          {accounts.length > 0 ? (
+            <BankAccountList accounts={accounts} />
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full">
+              <p className="text-sm text-gray-500">Nenhuma conta cadastrada</p>
+            </div>
+          )}
         </PageContent>
       </PageContainer>
     );
