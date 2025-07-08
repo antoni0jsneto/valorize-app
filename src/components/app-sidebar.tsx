@@ -77,7 +77,7 @@ export function AppSidebar() {
 
   const menuItems: MenuItem[] = [
     { label: "Visão Geral", icon: PieChart, href: "/dashboard" },
-    { label: "Lançamentos", icon: Receipt, href: "/dashboard/transactions" },
+    { label: "Lançamentos", icon: Receipt, href: "/lancamentos" },
     { label: "Relatórios", icon: FileBarChart, href: "/dashboard/reports" },
     { label: "Limite de Gastos", icon: Wallet, href: "/dashboard/limits" },
     { label: "", icon: PieChart, href: "", type: "separator" },
