@@ -4,17 +4,24 @@ import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { Icon, IconName } from "@/components/categories/icon-map";
 
 interface Transaction {
   id: string;
   day: number;
   name: string;
-  category: string;
+  category: {
+    name: string;
+    icon: IconName;
+    color: string;
+  };
   amount: number;
   status: "paid" | "pending";
   type: "income" | "expense";
-  icon: string;
-  color: string;
+  account: {
+    name: string;
+    icon: string;
+  };
 }
 
 const mockTransactions: Transaction[] = [
@@ -22,100 +29,154 @@ const mockTransactions: Transaction[] = [
     id: "1",
     day: 2,
     name: "Jô Dantas",
-    category: "Trabalho",
+    category: {
+      name: "Casa",
+      icon: "home",
+      color: "#3F51B5",
+    },
     amount: -200.0,
     status: "paid",
     type: "expense",
-    icon: "👤",
-    color: "bg-blue-500",
+    account: {
+      name: "Nubank",
+      icon: "💳",
+    },
   },
   {
     id: "2",
     day: 2,
     name: "Banco Safron",
-    category: "Banco",
+    category: {
+      name: "Casa",
+      icon: "home",
+      color: "#3F51B5",
+    },
     amount: -60.0,
     status: "pending",
     type: "expense",
-    icon: "🏦",
-    color: "bg-orange-500",
+    account: {
+      name: "Itaú",
+      icon: "🏦",
+    },
   },
   {
     id: "3",
     day: 5,
     name: "Salário",
-    category: "Trabalho",
+    category: {
+      name: "Casa",
+      icon: "home",
+      color: "#3F51B5",
+    },
     amount: 5000.0,
     status: "paid",
     type: "income",
-    icon: "💰",
-    color: "bg-green-500",
+    account: {
+      name: "Bradesco",
+      icon: "🏦",
+    },
   },
   {
     id: "4",
     day: 5,
     name: "Dono da Inglês Neto",
-    category: "Aluguel",
+    category: {
+      name: "Casa",
+      icon: "home",
+      color: "#3F51B5",
+    },
     amount: -200.0,
     status: "pending",
     type: "expense",
-    icon: "🏠",
-    color: "bg-blue-500",
+    account: {
+      name: "Nubank",
+      icon: "💳",
+    },
   },
   {
     id: "5",
     day: 7,
     name: "Comissão Di Gráfica",
-    category: "Trabalho",
+    category: {
+      name: "Trabalho",
+      icon: "briefcase",
+      color: "#673AB7",
+    },
     amount: 1500.0,
     status: "paid",
     type: "income",
-    icon: "💼",
-    color: "bg-green-500",
+    account: {
+      name: "Bradesco",
+      icon: "🏦",
+    },
   },
   {
     id: "6",
     day: 7,
     name: "Comissão Di Painéis",
-    category: "Trabalho",
+    category: {
+      name: "Trabalho",
+      icon: "briefcase",
+      color: "#673AB7",
+    },
     amount: 8000.0,
     status: "paid",
     type: "income",
-    icon: "💼",
-    color: "bg-green-500",
+    account: {
+      name: "Bradesco",
+      icon: "🏦",
+    },
   },
   {
     id: "7",
     day: 7,
     name: "Jô Painéis Salão",
-    category: "Trabalho",
+    category: {
+      name: "Trabalho",
+      icon: "briefcase",
+      color: "#673AB7",
+    },
     amount: 2600.0,
     status: "pending",
     type: "income",
-    icon: "💼",
-    color: "bg-green-500",
+    account: {
+      name: "Itaú",
+      icon: "🏦",
+    },
   },
   {
     id: "8",
     day: 7,
     name: "Luz Ener Demo",
-    category: "Contas",
+    category: {
+      name: "Casa",
+      icon: "home",
+      color: "#3F51B5",
+    },
     amount: -265.22,
     status: "paid",
     type: "expense",
-    icon: "⚡",
-    color: "bg-blue-500",
+    account: {
+      name: "Nubank",
+      icon: "💳",
+    },
   },
   {
     id: "9",
     day: 7,
     name: "Escolinha do Falcão",
-    category: "Educação",
+    category: {
+      name: "Educação",
+      icon: "graduation-cap",
+      color: "#009688",
+    },
     amount: -170.0,
     status: "pending",
     type: "expense",
-    icon: "🎓",
-    color: "bg-blue-500",
+    account: {
+      name: "Itaú",
+      icon: "🏦",
+    },
   },
 ];
 
@@ -167,17 +228,27 @@ export function TransactionsList() {
                         <div
                           className={cn(
                             "w-8 h-8 rounded-full flex items-center justify-center text-white text-sm",
-                            transaction.color
+                            "bg-[" + transaction.category.color + "]"
                           )}
                         >
-                          {transaction.icon}
+                          <Icon
+                            name={transaction.category.icon as IconName}
+                            className="h-8 w-8 rounded-full p-2 text-white"
+                            style={{
+                              backgroundColor: transaction.category.color,
+                            }}
+                          />
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">
                             {transaction.name}
                           </p>
-                          <p className="text-sm text-gray-500">
-                            {transaction.category}
+                          <p className="text-sm text-gray-500 flex items-center gap-2">
+                            {transaction.category.name}
+                            <span className="inline-flex items-center gap-1 text-gray-400">
+                              • {transaction.account.icon}{" "}
+                              {transaction.account.name}
+                            </span>
                           </p>
                         </div>
                       </div>
