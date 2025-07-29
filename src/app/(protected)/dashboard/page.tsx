@@ -17,12 +17,9 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen pt-20 md:pt-0 gap-2">
-      <AppSidebar />
-      <div className="flex-1">
-        <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-        <p>Welcome, {session.user?.name || session.user?.email}</p>
-      </div>
+    <div className="flex-1">
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      <p>Welcome, {session.user?.name || session.user?.email}</p>
     </div>
   );
 };
