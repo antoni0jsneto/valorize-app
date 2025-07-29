@@ -170,7 +170,7 @@ export function AppSidebar() {
       <ScrollArea className="flex-1 px-3">
         <TooltipProvider>
           {/* Main Menu */}
-          <div className="space-y-2 py-4">
+          <div className="space-y-2 pt-4">
             {menuItems.map((item, index) => {
               if (item.type === "separator") {
                 return <Separator key={index} className="my-4" />;
