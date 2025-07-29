@@ -13,6 +13,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   ChevronFirst,
   ChevronLast,
   Menu,
@@ -30,6 +36,8 @@ import {
   FolderTree,
   BellDot,
   LogOut,
+  Settings,
+  ChevronRight,
 } from "lucide-react";
 import { FaChartPie } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
@@ -42,6 +50,7 @@ interface MenuItem {
   icon: LucideIcon;
   href: string;
   type?: "separator";
+  submenu?: MenuItem[];
 }
 
 export function AppSidebar() {
@@ -52,12 +61,13 @@ export function AppSidebar() {
   const pathname = usePathname();
 
   const isMenuItemActive = (href: string) => {
-    if (
-      href === "/settings/accounts" ||
-      href === "/settings/credit-cards" ||
-      href === "/settings/categories"
-    ) {
+    // Check if it's a submenu item
+    if (href.startsWith("/configuracoes/")) {
       return pathname === href;
+    }
+    // Check if it's the main settings menu
+    if (href === "/configuracoes") {
+      return pathname.startsWith("/configuracoes");
     }
     return pathname === href;
   };
@@ -78,22 +88,40 @@ export function AppSidebar() {
   const menuItems: MenuItem[] = [
     { label: "Visão Geral", icon: PieChart, href: "/dashboard" },
     { label: "Lançamentos", icon: Receipt, href: "/lancamentos" },
-    { label: "Relatórios", icon: FileBarChart, href: "/dashboard/reports" },
-    { label: "Limite de Gastos", icon: Wallet, href: "/dashboard/limits" },
+    { label: "Relatórios", icon: FileBarChart, href: "/relatorios" },
+    { label: "Limite de Gastos", icon: Wallet, href: "/limite-de-gastos" },
     { label: "", icon: PieChart, href: "", type: "separator" },
-    { label: "Contas", icon: Wallet, href: "/settings/accounts" },
     {
-      label: "Cartões de Crédito",
-      icon: CreditCard,
-      href: "/settings/credit-cards",
+      label: "Configurações",
+      icon: Settings,
+      href: "/configuracoes",
+      submenu: [
+        { label: "Contas", icon: Wallet, href: "/configuracoes/contas" },
+        {
+          label: "Cartões de Crédito",
+          icon: CreditCard,
+          href: "/configuracoes/cartoes-de-credito",
+        },
+        {
+          label: "Categorias",
+          icon: FolderTree,
+          href: "/configuracoes/categorias",
+        },
+        {
+          label: "Preferências",
+          icon: Sliders,
+          href: "/configuracoes/preferencias",
+        },
+        { label: "Meu Plano", icon: Heart, href: "/configuracoes/plano" },
+        { label: "Tags", icon: Tags, href: "/configuracoes/tags" },
+        { label: "Alertas", icon: AlertCircle, href: "/configuracoes/alertas" },
+        {
+          label: "Atividades",
+          icon: Activity,
+          href: "/configuracoes/atividades",
+        },
+      ],
     },
-    { label: "Categorias", icon: FolderTree, href: "/settings/categories" },
-    { label: "", icon: PieChart, href: "", type: "separator" },
-    { label: "Preferências", icon: Sliders, href: "/settings/preferences" },
-    { label: "Meu Plano", icon: Heart, href: "/settings/plan" },
-    { label: "Tags", icon: Tags, href: "/settings/tags" },
-    { label: "Alertas", icon: AlertCircle, href: "/settings/alerts" },
-    { label: "Atividades", icon: Activity, href: "/settings/activities" },
   ];
 
   const SidebarContent = () => (
@@ -149,6 +177,67 @@ export function AppSidebar() {
               }
 
               const Icon = item.icon;
+
+              if (item.submenu) {
+                return (
+                  <DropdownMenu key={item.label}>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant={
+                          isMenuItemActive(item.href) ? "green" : "ghost"
+                        }
+                        className={`
+                          w-full relative hover:bg-gray-100
+                          ${
+                            expanded
+                              ? "justify-start gap-3"
+                              : "justify-center p-2"
+                          }
+                          ${isMobile && "justify-start gap-3"}
+                        `}
+                      >
+                        <Icon size={22} />
+                        {(expanded || isMobile) && (
+                          <>
+                            <span className="flex-1 text-left">
+                              {item.label}
+                            </span>
+                            <ChevronRight size={16} className="ml-auto" />
+                          </>
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      side={expanded || isMobile ? "right" : "right"}
+                      className="w-56"
+                      align={expanded || isMobile ? "start" : "start"}
+                      sideOffset={expanded || isMobile ? 10 : 0}
+                    >
+                      {item.submenu.map((subItem) => {
+                        const SubIcon = subItem.icon;
+                        const isActive = isMenuItemActive(subItem.href);
+                        return (
+                          <DropdownMenuItem key={subItem.label} asChild>
+                            <Link
+                              href={subItem.href}
+                              className={`flex items-center gap-2 w-full ${
+                                isActive ? "bg-emerald-50 text-emerald-600" : ""
+                              }`}
+                            >
+                              <SubIcon
+                                size={18}
+                                className={isActive ? "text-emerald-600" : ""}
+                              />
+                              <span>{subItem.label}</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        );
+                      })}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                );
+              }
+
               return (
                 <Tooltip key={item.label}>
                   <TooltipTrigger asChild>
