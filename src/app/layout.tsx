@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { ToasterProvider } from "@/components/providers/toaster-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 export const metadata: Metadata = {
   title: "Valorize: Controle suas finanças pessoais e empresariais",
@@ -19,8 +20,10 @@ export default function RootLayout({
     <html lang="pt-BR" className={GeistSans.className}>
       <body className="antialiased bg-gray-50">
         <AuthProvider>
-          {children}
-          <ToasterProvider />
+          <QueryProvider>
+            {children}
+            <ToasterProvider />
+          </QueryProvider>
         </AuthProvider>
       </body>
     </html>
