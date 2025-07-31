@@ -42,6 +42,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { CalendarIcon, Upload, Check } from "lucide-react";
+import { TagCombobox } from "./tag-combobox";
 import { Combobox } from "@/components/ui/combobox";
 import { cn } from "@/lib/utils";
 
@@ -616,24 +617,15 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                   name="tags"
                   render={({ field }) => (
                     <FormItem>
-                      <Select
-                        onValueChange={(value) => {
-                          const currentTags = field.value || [];
-                          if (!currentTags.includes(value)) {
-                            field.onChange([...currentTags, value]);
-                          }
-                        }}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione as tags" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="tag1">Tag 1</SelectItem>
-                          <SelectItem value="tag2">Tag 2</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <TagCombobox
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          placeholder="Selecione ou crie tags"
+                          emptyText="Nenhuma tag encontrada. Digite e pressione Enter para criar."
+                        />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
