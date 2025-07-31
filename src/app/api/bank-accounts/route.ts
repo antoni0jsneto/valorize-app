@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, icon, iconColor, type = "CHECKING" } = body;
+    const { name, icon, iconColor } = body;
 
     if (!name || !icon || !iconColor) {
       return new NextResponse("Missing required fields", { status: 400 });
@@ -81,7 +81,6 @@ export async function POST(req: Request) {
         name,
         icon,
         iconColor,
-        type,
         userId: user.id,
       },
     });
