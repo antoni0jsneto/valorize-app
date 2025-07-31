@@ -87,7 +87,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
   const resetModal = () => {
     form.reset({
       description: "",
-      amount: "0,00",
+      amount: "",
       date: new Date(),
       account: "",
       category: "",
@@ -109,9 +109,14 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       description: "",
-      amount: "R$ 0,00",
+      amount: "",
       date: new Date(),
+      account: "",
+      category: "",
       isRecurring: false,
+      recurrenceType: undefined,
+      recurrenceFrequency: undefined,
+      installments: undefined,
       notes: "",
       attachments: [],
       tags: [],
@@ -122,7 +127,6 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
     try {
       console.log(values);
       // TODO: Implementar a chamada à API aqui
-      resetModal();
       onOpenChange(false);
     } catch (error) {
       console.error(error);
@@ -139,6 +143,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
         }
         onOpenChange(opened);
       }}
+      onClose={resetModal}
     >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -639,7 +644,10 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onOpenChange(false)}
+                onClick={() => {
+                  resetModal();
+                  onOpenChange(false);
+                }}
               >
                 Cancelar
               </Button>
