@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -91,6 +91,23 @@ export function TransferModal({ open, onOpenChange }: TransferModalProps) {
   const [showNotes, setShowNotes] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [showTags, setShowTags] = useState(false);
+  const [transferCategory, setTransferCategory] = useState<string>();
+
+  // Buscar ou criar a categoria de transferência
+  useEffect(() => {
+    const fetchTransferCategory = async () => {
+      try {
+        const response = await fetch("/api/categories/transfer");
+        if (!response.ok) throw new Error("Failed to fetch transfer category");
+        const category = await response.json();
+        setTransferCategory(category.id);
+      } catch (error) {
+        console.error("Error fetching transfer category:", error);
+      }
+    };
+
+    fetchTransferCategory();
+  }, []);
 
   const resetModal = () => {
     form.reset({
@@ -133,26 +150,66 @@ export function TransferModal({ open, onOpenChange }: TransferModalProps) {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!transferCategory) {
+      console.error("Transfer category not found");
+      return;
+    }
     try {
       // Remover o prefixo "R$ " e converter para número
       const numericAmount = parseFloat(
         values.amount.replace(/[^\d,]/g, "").replace(",", ".")
       );
 
-      const response = await fetch("/api/expenses", {
+      // Criar a saída (débito)
+      const debitResponse = await fetch("/api/expenses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...values,
+          description: values.description,
           amount: numericAmount,
-          type: "TRANSFER",
+          date: values.date,
+          account: values.fromAccount,
+          category: transferCategory,
+          type: "EXPENSE",
+          isRecurring: values.isRecurring,
+          recurrenceType: values.recurrenceType,
+          recurrenceFrequency: values.recurrenceFrequency,
+          installments: values.installments,
+          notes: values.notes,
+          tags: values.tags,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create transfer");
+      if (!debitResponse.ok) {
+        throw new Error("Failed to create debit transaction");
+      }
+
+      // Criar a entrada (crédito)
+      const creditResponse = await fetch("/api/expenses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          description: values.description,
+          amount: numericAmount,
+          date: values.date,
+          account: values.toAccount,
+          category: transferCategory,
+          type: "INCOME",
+          isRecurring: values.isRecurring,
+          recurrenceType: values.recurrenceType,
+          recurrenceFrequency: values.recurrenceFrequency,
+          installments: values.installments,
+          notes: values.notes,
+          tags: values.tags,
+        }),
+      });
+
+      if (!creditResponse.ok) {
+        throw new Error("Failed to create credit transaction");
       }
 
       await queryClient.invalidateQueries({ queryKey: expensesQueryKey });
