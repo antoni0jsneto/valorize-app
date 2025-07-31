@@ -49,6 +49,7 @@ model Account {
 model BankAccount {
   id        String   @id @default(cuid())
   name      String
+  type      String   @default("CHECKING") // "CHECKING" | "SAVINGS" | "INVESTMENT" | "WALLET"
   icon      String
   iconColor String
   userId    String

@@ -16,10 +16,12 @@ import {
 } from "lucide-react";
 import { ExpenseModal } from "./expense-modal";
 import { IncomeModal } from "./income-modal";
+import { TransferModal } from "./transfer-modal";
 
 export function NewTransactionDropdown() {
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   const [incomeModalOpen, setIncomeModalOpen] = useState(false);
+  const [transferModalOpen, setTransferModalOpen] = useState(false);
   const [modalKey, setModalKey] = useState(0);
 
   const handleOpenExpenseModal = () => {
@@ -30,6 +32,11 @@ export function NewTransactionDropdown() {
   const handleOpenIncomeModal = () => {
     setModalKey((key) => key + 1);
     setIncomeModalOpen(true);
+  };
+
+  const handleOpenTransferModal = () => {
+    setModalKey((key) => key + 1);
+    setTransferModalOpen(true);
   };
 
   return (
@@ -43,6 +50,11 @@ export function NewTransactionDropdown() {
         key={`income-${modalKey}`}
         open={incomeModalOpen}
         onOpenChange={setIncomeModalOpen}
+      />
+      <TransferModal
+        key={`transfer-${modalKey}`}
+        open={transferModalOpen}
+        onOpenChange={setTransferModalOpen}
       />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -60,7 +72,7 @@ export function NewTransactionDropdown() {
             <ArrowUpCircle className="h-4 w-4 mr-2 text-green-500" />
             Nova Receita
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={handleOpenTransferModal}>
             <ArrowLeftRight className="h-4 w-4 mr-2 text-blue-500" />
             Nova Transferência
           </DropdownMenuItem>

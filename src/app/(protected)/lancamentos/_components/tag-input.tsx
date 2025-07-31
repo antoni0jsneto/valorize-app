@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { tagsQueryKey } from "@/app/(protected)/configuracoes/tags/_components/use-tags";
 
 interface Tag {
   id: string;
@@ -46,7 +45,7 @@ export function TagInput({
       return response.json();
     },
     onSuccess: (newTag) => {
-      queryClient.invalidateQueries({ queryKey: tagsQueryKey });
+      queryClient.invalidateQueries({ queryKey: ["tags"] });
       onValueChange([...value, newTag.id]);
       setSearchValue("");
     },

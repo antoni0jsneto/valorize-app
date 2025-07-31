@@ -17,11 +17,26 @@ export async function GET() {
           email: session.user.email,
         },
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        icon: true,
+        iconColor: true,
         creditCards: {
-          include: {
-            bankAccount: true
-          }
+          select: {
+            id: true,
+            name: true,
+            icon: true,
+            iconColor: true,
+            bankAccount: {
+              select: {
+                id: true,
+                name: true,
+                icon: true,
+                iconColor: true,
+              },
+            },
+          },
         },
       },
       orderBy: {
@@ -45,7 +60,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, icon, iconColor } = body;
+    const { name, icon, iconColor, type = "CHECKING" } = body;
 
     if (!name || !icon || !iconColor) {
       return new NextResponse("Missing required fields", { status: 400 });
@@ -66,6 +81,7 @@ export async function POST(req: Request) {
         name,
         icon,
         iconColor,
+        type,
         userId: user.id,
       },
     });

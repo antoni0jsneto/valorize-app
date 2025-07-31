@@ -34,7 +34,9 @@ export function useAccounts() {
       if (!response.ok) {
         throw new Error("Failed to fetch accounts");
       }
-      return await response.json();
+      const data = await response.json();
+      console.log("API Response:", JSON.stringify(data, null, 2));
+      return data;
     },
   });
 }
