@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
+import { accountsQueryKey } from "@/app/(protected)/lancamentos/_components/use-accounts";
 import {
   Dialog,
   DialogContent,
@@ -23,6 +25,7 @@ interface BankAccountDialogProps {
 
 export function BankAccountDialog({ children }: BankAccountDialogProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState<BankIconType>("wallet");
@@ -49,6 +52,7 @@ export function BankAccountDialog({ children }: BankAccountDialogProps) {
         throw new Error("Failed to create bank account");
       }
 
+      await queryClient.invalidateQueries({ queryKey: accountsQueryKey });
       router.refresh();
       setOpen(false);
     } catch (error) {

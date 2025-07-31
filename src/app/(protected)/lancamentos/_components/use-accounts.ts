@@ -24,9 +24,11 @@ export interface Account {
   creditCards?: CreditCard[];
 }
 
+export const accountsQueryKey = ["accounts"] as const;
+
 export function useAccounts() {
   return useQuery<Account[]>({
-    queryKey: ["accounts"],
+    queryKey: accountsQueryKey,
     queryFn: async () => {
       const response = await fetch("/api/bank-accounts");
       if (!response.ok) {

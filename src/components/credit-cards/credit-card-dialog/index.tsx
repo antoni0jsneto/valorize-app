@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
+import { accountsQueryKey } from "@/app/(protected)/lancamentos/_components/use-accounts";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +27,7 @@ interface CreditCardDialogProps {
 
 export function CreditCardDialog({ bankAccounts }: CreditCardDialogProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState<string>("creditcard");
@@ -62,6 +65,7 @@ export function CreditCardDialog({ bankAccounts }: CreditCardDialogProps) {
         throw new Error("Failed to create credit card");
       }
 
+      await queryClient.invalidateQueries({ queryKey: accountsQueryKey });
       setOpen(false);
       router.refresh();
     } catch (error) {
