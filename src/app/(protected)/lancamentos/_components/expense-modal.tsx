@@ -32,6 +32,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { expensesQueryKey } from "./use-expenses";
 import * as z from "zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -86,6 +88,7 @@ const formSchema = z.object({
 });
 
 export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
+  const queryClient = useQueryClient();
   const { data: accounts, isLoading: isLoadingAccounts } = useAccounts();
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
   const [showNotes, setShowNotes] = useState(false);
@@ -133,8 +136,28 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log(values);
-      // TODO: Implementar a chamada à API aqui
+      // Remover o prefixo "R$ " e converter para número
+      const numericAmount = parseFloat(
+        values.amount.replace(/[^\d,]/g, "").replace(",", ".")
+      );
+
+      const response = await fetch("/api/expenses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...values,
+          amount: numericAmount,
+          type: "EXPENSE",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create expense");
+      }
+
+      await queryClient.invalidateQueries({ queryKey: expensesQueryKey });
       onOpenChange(false);
     } catch (error) {
       console.error(error);

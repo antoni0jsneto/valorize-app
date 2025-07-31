@@ -22,6 +22,7 @@ model User {
   bankAccounts      BankAccount[]
   creditCards       CreditCard[]
   tags              Tag[]
+  expenses          Expense[]
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 }
@@ -53,6 +54,7 @@ model BankAccount {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   creditCards CreditCard[]
+  expenses  Expense[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -71,6 +73,7 @@ model CreditCard {
   bankAccountId   String
   user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   bankAccount     BankAccount @relation(fields: [bankAccountId], references: [id])
+  expenses        Expense[]
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
@@ -112,6 +115,7 @@ model Category {
   userId        String
   user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   subcategories SubCategory[]
+  expenses      Expense[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
@@ -131,15 +135,45 @@ model SubCategory {
 }
 
 model Tag {
-  id        String   @id @default(uuid())
+  id        String     @id @default(uuid())
   name      String
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expenses  Expense[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   @@unique([name, userId])
   @@index([userId])
+}
+
+model Expense {
+  id          String     @id @default(uuid())
+  description String
+  amount      Float
+  date        DateTime
+  type        String     // "EXPENSE" | "INCOME"
+  isRecurring Boolean    @default(false)
+  recurrenceType String? // "fixed" | "installments"
+  recurrenceFrequency String? // "daily" | "weekly" | "biweekly" | "monthly" | "bimonthly" | "quarterly" | "semiannually" | "annually"
+  installments Int?
+  notes       String?
+  userId      String
+  bankAccountId String?
+  creditCardId  String?
+  categoryId    String
+  tags          Tag[]
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bankAccount   BankAccount? @relation(fields: [bankAccountId], references: [id])
+  creditCard    CreditCard? @relation(fields: [creditCardId], references: [id])
+  category      Category    @relation(fields: [categoryId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([bankAccountId])
+  @@index([creditCardId])
+  @@index([categoryId])
 }
 
 enum CategoryType {
