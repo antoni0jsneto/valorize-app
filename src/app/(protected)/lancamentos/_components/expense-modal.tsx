@@ -110,6 +110,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
       attachments: [],
       tags: [],
     });
+    form.clearErrors();
     setShowNotes(false);
     setShowAttachments(false);
     setShowTags(false);
@@ -158,6 +159,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
       }
 
       await queryClient.invalidateQueries({ queryKey: expensesQueryKey });
+      resetModal();
       onOpenChange(false);
     } catch (error) {
       console.error(error);

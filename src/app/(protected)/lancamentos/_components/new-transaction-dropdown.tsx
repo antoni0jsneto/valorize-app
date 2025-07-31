@@ -11,12 +11,23 @@ import {
 import { Plus, ArrowDownCircle, ArrowUpCircle, ArrowLeftRight } from "lucide-react";
 import { ExpenseModal } from "./expense-modal";
 
+
 export function NewTransactionDropdown() {
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
+  const [modalKey, setModalKey] = useState(0);
+
+  const handleOpenExpenseModal = () => {
+    setModalKey(key => key + 1);
+    setExpenseModalOpen(true);
+  };
 
   return (
     <>
-      <ExpenseModal open={expenseModalOpen} onOpenChange={setExpenseModalOpen} />
+      <ExpenseModal 
+        key={modalKey}
+        open={expenseModalOpen} 
+        onOpenChange={setExpenseModalOpen}
+      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button size="sm" variant="blue">
@@ -25,7 +36,7 @@ export function NewTransactionDropdown() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setExpenseModalOpen(true)}>
+          <DropdownMenuItem onClick={handleOpenExpenseModal}>
             <ArrowDownCircle className="h-4 w-4 mr-2 text-red-500" />
             Nova Despesa
           </DropdownMenuItem>
