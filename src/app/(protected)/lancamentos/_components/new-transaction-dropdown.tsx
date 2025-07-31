@@ -8,24 +8,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Plus, ArrowDownCircle, ArrowUpCircle, ArrowLeftRight } from "lucide-react";
+import {
+  Plus,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  ArrowLeftRight,
+} from "lucide-react";
 import { ExpenseModal } from "./expense-modal";
-
 
 export function NewTransactionDropdown() {
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   const [modalKey, setModalKey] = useState(0);
 
   const handleOpenExpenseModal = () => {
-    setModalKey(key => key + 1);
+    setModalKey((key) => key + 1);
     setExpenseModalOpen(true);
   };
 
   return (
     <>
-      <ExpenseModal 
+      <ExpenseModal
         key={modalKey}
-        open={expenseModalOpen} 
+        open={expenseModalOpen}
         onOpenChange={setExpenseModalOpen}
       />
       <DropdownMenu>

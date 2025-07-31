@@ -39,6 +39,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useAccounts } from "./use-accounts";
 import { useCategories, type CategoryWithIcon } from "./use-categories";
+import { useTags } from "./use-tags";
 import Image from "next/image";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -48,7 +49,7 @@ import {
 } from "@/components/ui/popover";
 import { CalendarIcon, Upload, Check } from "lucide-react";
 import { TagCombobox } from "./tag-combobox";
-import { Combobox } from "@/components/ui/combobox";
+import { TagInput } from "./tag-input";
 import { cn } from "@/lib/utils";
 import {
   creditCardIcons,
@@ -91,6 +92,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
   const queryClient = useQueryClient();
   const { data: accounts, isLoading: isLoadingAccounts } = useAccounts();
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
+  const { data: tags } = useTags();
   const [showNotes, setShowNotes] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [showTags, setShowTags] = useState(false);
@@ -693,11 +695,11 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <TagCombobox
+                        <TagInput
                           value={field.value}
                           onValueChange={field.onChange}
-                          placeholder="Selecione ou crie tags"
-                          emptyText="Nenhuma tag encontrada. Digite e pressione Enter para criar."
+                          availableTags={tags || []}
+                          placeholder="Adicionar tag..."
                         />
                       </FormControl>
                       <FormMessage />
