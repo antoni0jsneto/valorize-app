@@ -5,8 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 export interface Account {
   id: string;
   name: string;
-  icon: string;
   type: "CHECKING" | "SAVINGS" | "INVESTMENT" | "WALLET";
+  icon: string;
+  iconColor: string;
 }
 
 export function useAccounts() {
@@ -17,11 +18,7 @@ export function useAccounts() {
       if (!response.ok) {
         throw new Error("Failed to fetch accounts");
       }
-      const accounts = await response.json();
-      return accounts.map((account: Account) => ({
-        ...account,
-        icon: `/banks/${account.icon}`,
-      }));
+      return await response.json();
     },
   });
 }

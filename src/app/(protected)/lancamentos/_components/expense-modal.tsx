@@ -268,13 +268,13 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                           accounts?.map((account) => (
                             <SelectItem key={account.id} value={account.id}>
                               <div className="flex items-center gap-2">
-                                <div className="relative w-4 h-4">
+                                <div className="relative w-4 h-4 rounded-full overflow-hidden">
                                   {account.icon && (
                                     <Image
-                                      src={account.icon}
+                                      src={`/banks/${account.icon}.png`}
                                       alt={account.name}
                                       fill
-                                      className="object-contain"
+                                      className="object-contain rounded-full"
                                     />
                                   )}
                                 </div>
