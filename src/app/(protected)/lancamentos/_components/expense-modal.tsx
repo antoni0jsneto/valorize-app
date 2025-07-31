@@ -296,59 +296,45 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Categoria</FormLabel>
-                    <FormControl>
-                      {isLoadingCategories ? (
-                        <Button
-                          variant="outline"
-                          disabled
-                          className="w-full justify-start"
-                        >
-                          <span className="text-muted-foreground">
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione uma categoria" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {isLoadingCategories ? (
+                          <SelectItem value="loading" disabled>
                             Carregando categorias...
-                          </span>
-                        </Button>
-                      ) : (
-                        <Combobox
-                          items={
-                            categories
-                              ?.filter(
-                                (cat: CategoryWithIcon) =>
-                                  cat.type === "EXPENSE"
-                              )
-                              .map((category: CategoryWithIcon) => ({
-                                value: category.id,
-                                label: category.name,
-                                icon: category.icon,
-                                color: category.color,
-                              })) || []
-                          }
-                          value={field.value || ""}
-                          onValueChange={(value) => field.onChange(value)}
-                          placeholder="Selecione uma categoria"
-                          renderItem={(item) => (
-                            <div className="flex items-center gap-2">
-                              {item.icon && (
-                                <div
-                                  className="h-6 w-6 rounded-full flex items-center justify-center"
-                                  style={{ backgroundColor: item.color }}
-                                >
-                                  <item.icon className="h-4 w-4 text-white" />
+                          </SelectItem>
+                        ) : (
+                          categories
+                            ?.filter(
+                              (cat: CategoryWithIcon) => cat.type === "EXPENSE"
+                            )
+                            .map((category: CategoryWithIcon) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                <div className="flex items-center gap-2">
+                                  {category.icon && (
+                                    <div
+                                      className="h-6 w-6 rounded-full flex items-center justify-center"
+                                      style={{
+                                        backgroundColor: category.color,
+                                      }}
+                                    >
+                                      <category.icon className="h-4 w-4 text-white" />
+                                    </div>
+                                  )}
+                                  <span>{category.name}</span>
                                 </div>
-                              )}
-                              <span>{item.label}</span>
-                              <Check
-                                className={cn(
-                                  "ml-auto h-4 w-4",
-                                  field.value === item.value
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                            </div>
-                          )}
-                        />
-                      )}
-                    </FormControl>
+                              </SelectItem>
+                            ))
+                        )}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
