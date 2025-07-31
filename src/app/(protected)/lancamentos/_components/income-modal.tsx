@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { expensesQueryKey } from "./use-expenses";
 import * as z from "zod";
@@ -47,8 +47,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, Upload, Check } from "lucide-react";
-import { TagCombobox } from "./tag-combobox";
+import { CalendarIcon, Upload } from "lucide-react";
 import { TagInput } from "./tag-input";
 import { cn } from "@/lib/utils";
 import {
@@ -56,7 +55,7 @@ import {
   GENERIC_ICONS,
 } from "@/components/credit-cards/icon-map";
 
-interface ExpenseModalProps {
+interface IncomeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -88,7 +87,7 @@ const formSchema = z.object({
   tags: z.array(z.string()).default([]),
 });
 
-export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
+export function IncomeModal({ open, onOpenChange }: IncomeModalProps) {
   const queryClient = useQueryClient();
   const { data: accounts, isLoading: isLoadingAccounts } = useAccounts();
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
@@ -152,12 +151,12 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
         body: JSON.stringify({
           ...values,
           amount: numericAmount,
-          type: "EXPENSE",
+          type: "INCOME",
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create expense");
+        throw new Error("Failed to create income");
       }
 
       await queryClient.invalidateQueries({ queryKey: expensesQueryKey });
@@ -182,7 +181,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
     >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nova despesa</DialogTitle>
+          <DialogTitle>Nova receita</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -195,7 +194,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Digite a descrição da despesa"
+                      placeholder="Digite a descrição da receita"
                       {...field}
                     />
                   </FormControl>
@@ -394,7 +393,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                         ) : (
                           categories
                             ?.filter(
-                              (cat: CategoryWithIcon) => cat.type === "EXPENSE"
+                              (cat: CategoryWithIcon) => cat.type === "INCOME"
                             )
                             .map((category: CategoryWithIcon) => (
                               <SelectItem key={category.id} value={category.id}>
@@ -451,7 +450,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="fixed">Despesa Fixa</SelectItem>
+                            <SelectItem value="fixed">Receita Fixa</SelectItem>
                             <SelectItem value="installments">
                               Parcelado
                             </SelectItem>

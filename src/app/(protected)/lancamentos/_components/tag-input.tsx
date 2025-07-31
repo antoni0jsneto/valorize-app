@@ -85,19 +85,10 @@ export function TagInput({
           }}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Adicionar tag...">
-              {(value) => {
-                const selectedTag = availableTags.find(
-                  (tag) => tag.id === value
-                );
-                return (
-                  <div className="flex items-center gap-2">
-                    <TagIcon className="h-4 w-4" />
-                    <span>{selectedTag?.name}</span>
-                  </div>
-                );
-              }}
-            </SelectValue>
+            <div className="flex items-center gap-2">
+              <TagIcon className="h-4 w-4" />
+              <SelectValue placeholder="Adicionar tag..." />
+            </div>
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
