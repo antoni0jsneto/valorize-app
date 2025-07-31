@@ -59,21 +59,21 @@ export function NewTransactionDropdown() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button size="sm" variant="blue">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4" />
             Novo Lançamento
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={handleOpenExpenseModal}>
-            <ArrowDownCircle className="h-4 w-4 mr-2 text-red-500" />
+            <ArrowDownCircle className="h-4 w-4 text-red-500" />
             Nova Despesa
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleOpenIncomeModal}>
-            <ArrowUpCircle className="h-4 w-4 mr-2 text-green-500" />
+            <ArrowUpCircle className="h-4 w-4 text-green-500" />
             Nova Receita
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleOpenTransferModal}>
-            <ArrowLeftRight className="h-4 w-4 mr-2 text-blue-500" />
+            <ArrowLeftRight className="h-4 w-4 text-blue-500" />
             Nova Transferência
           </DropdownMenuItem>
         </DropdownMenuContent>
