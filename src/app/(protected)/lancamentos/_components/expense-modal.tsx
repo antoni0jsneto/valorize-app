@@ -17,6 +17,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel,
+  SelectSeparator,
 } from "@/components/ui/select";
 import {
   Form,
@@ -45,6 +48,10 @@ import { CalendarIcon, Upload, Check } from "lucide-react";
 import { TagCombobox } from "./tag-combobox";
 import { Combobox } from "@/components/ui/combobox";
 import { cn } from "@/lib/utils";
+import {
+  creditCardIcons,
+  GENERIC_ICONS,
+} from "@/components/credit-cards/icon-map";
 
 interface ExpenseModalProps {
   open: boolean;
@@ -271,23 +278,66 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                         {isLoadingAccounts ? (
                           <SelectItem value="loading">Carregando...</SelectItem>
                         ) : (
-                          accounts?.map((account) => (
-                            <SelectItem key={account.id} value={account.id}>
-                              <div className="flex items-center gap-2">
-                                <div className="relative w-4 h-4 rounded-full overflow-hidden">
-                                  {account.icon && (
-                                    <Image
-                                      src={`/banks/${account.icon}.png`}
-                                      alt={account.name}
-                                      fill
-                                      className="object-contain rounded-full"
-                                    />
-                                  )}
-                                </div>
-                                {account.name}
-                              </div>
-                            </SelectItem>
-                          ))
+                          <>
+                            <SelectGroup>
+                              <SelectLabel className="px-2 py-1.5 text-sm font-semibold">
+                                Contas
+                              </SelectLabel>
+                              {accounts?.map((account) => (
+                                <SelectItem key={account.id} value={account.id}>
+                                  <div className="flex items-center gap-2">
+                                    <div className="relative w-4 h-4 rounded-full overflow-hidden">
+                                      {account.icon && (
+                                        <Image
+                                          src={`/banks/${account.icon}.png`}
+                                          alt={account.name}
+                                          fill
+                                          className="object-contain rounded-full"
+                                        />
+                                      )}
+                                    </div>
+                                    {account.name}
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+
+                            <SelectSeparator className="my-2" />
+
+                            <SelectGroup>
+                              <SelectLabel className="px-2 py-1.5 text-sm font-semibold">
+                                Cartões de Crédito
+                              </SelectLabel>
+                              {accounts?.flatMap((account) =>
+                                account.creditCards?.map((card) => {
+                                  const iconConfig =
+                                    creditCardIcons[
+                                      card.icon as keyof typeof creditCardIcons
+                                    ];
+                                  const Icon = iconConfig.icon;
+                                  const isGenericIcon =
+                                    card.icon in GENERIC_ICONS;
+                                  return (
+                                    <SelectItem key={card.id} value={card.id}>
+                                      <div className="flex items-center gap-2">
+                                        <div
+                                          className="relative w-4 h-4 rounded-full overflow-hidden flex items-center justify-center"
+                                          style={{
+                                            backgroundColor: isGenericIcon
+                                              ? card.iconColor
+                                              : undefined,
+                                          }}
+                                        >
+                                          <Icon className="h-4 w-4" />
+                                        </div>
+                                        {card.name}
+                                      </div>
+                                    </SelectItem>
+                                  );
+                                })
+                              )}
+                            </SelectGroup>
+                          </>
                         )}
                       </SelectContent>
                     </Select>

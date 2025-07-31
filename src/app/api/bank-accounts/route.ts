@@ -17,6 +17,13 @@ export async function GET() {
           email: session.user.email,
         },
       },
+      include: {
+        creditCards: {
+          include: {
+            bankAccount: true
+          }
+        },
+      },
       orderBy: {
         createdAt: "desc",
       },

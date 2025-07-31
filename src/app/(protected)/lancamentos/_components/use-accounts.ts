@@ -2,12 +2,26 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+export interface CreditCard {
+  id: string;
+  name: string;
+  icon: string;
+  iconColor: string;
+  bankAccount: {
+    id: string;
+    name: string;
+    icon: string;
+    iconColor: string;
+  };
+}
+
 export interface Account {
   id: string;
   name: string;
   type: "CHECKING" | "SAVINGS" | "INVESTMENT" | "WALLET";
   icon: string;
   iconColor: string;
+  creditCards?: CreditCard[];
 }
 
 export function useAccounts() {
