@@ -60,13 +60,14 @@ export default function ExpensesPage() {
       </PageHeader>
       <PageContent>
         <div className="space-y-6">
-          <TransactionsSummary {...summary} />
-
           {transactions.length > 0 ? (
-            <TransactionsList
-              transactions={transactions}
-              onTogglePaid={(id) => togglePaid.mutate(id)}
-            />
+            <div className="flex flex-col gap-4">
+              <TransactionsList
+                transactions={transactions}
+                onTogglePaid={(id) => togglePaid.mutate(id)}
+              />
+              <TransactionsSummary {...summary} />
+            </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-12">
               <p className="text-sm text-gray-500">

@@ -178,6 +178,24 @@ export async function POST(req: Request) {
       return new NextResponse("Category is required", { status: 400 });
     }
 
+    if (!type || !["EXPENSE", "INCOME"].includes(type)) {
+      return new NextResponse("Invalid transaction type", { status: 400 });
+    }
+
+    if (isRecurring && !recurrenceType) {
+      return new NextResponse(
+        "Recurrence type is required for recurring transactions",
+        { status: 400 }
+      );
+    }
+
+    if (recurrenceType === "installments" && !installments) {
+      return new NextResponse(
+        "Number of installments is required for installment transactions",
+        { status: 400 }
+      );
+    }
+
     const data = {
       description,
       amount: amountValue,

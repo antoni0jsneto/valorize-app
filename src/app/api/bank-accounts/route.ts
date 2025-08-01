@@ -20,6 +20,7 @@ export async function GET() {
       select: {
         id: true,
         name: true,
+        type: true,
         icon: true,
         iconColor: true,
         creditCards: {

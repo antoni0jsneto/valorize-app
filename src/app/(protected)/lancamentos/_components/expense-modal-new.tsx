@@ -17,8 +17,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectGroup,
-  SelectLabel,
 } from "@/components/ui/select";
 import {
   Form,
@@ -48,6 +46,7 @@ import { CalendarIcon, Upload } from "lucide-react";
 import { TagInput } from "./tag-input";
 import { cn } from "@/lib/utils";
 import { AccountSelect } from "./account-select";
+import { toast } from "sonner";
 
 interface ExpenseModalProps {
   open: boolean;
@@ -81,6 +80,21 @@ const formSchema = z.object({
   tags: z.array(z.string()).default([]),
 });
 
+const defaultValues = {
+  description: "",
+  amount: "",
+  date: new Date(),
+  account: "",
+  category: "",
+  isRecurring: false,
+  recurrenceType: undefined,
+  recurrenceFrequency: undefined,
+  installments: undefined,
+  notes: "",
+  attachments: [],
+  tags: [],
+};
+
 export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
   const queryClient = useQueryClient();
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
@@ -89,45 +103,19 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
   const [showAttachments, setShowAttachments] = useState(false);
   const [showTags, setShowTags] = useState(false);
 
+  const form = useForm({
+    mode: "onChange",
+    resolver: zodResolver(formSchema),
+    defaultValues,
+  });
+
   const resetModal = () => {
-    form.reset({
-      description: "",
-      amount: "",
-      date: new Date(),
-      account: "",
-      category: "",
-      isRecurring: false,
-      recurrenceType: undefined,
-      recurrenceFrequency: undefined,
-      installments: undefined,
-      notes: "",
-      attachments: [],
-      tags: [],
-    });
+    form.reset(defaultValues);
     form.clearErrors();
     setShowNotes(false);
     setShowAttachments(false);
     setShowTags(false);
   };
-
-  const form = useForm({
-    mode: "onChange",
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      description: "",
-      amount: "",
-      date: new Date(),
-      account: "",
-      category: "",
-      isRecurring: false,
-      recurrenceType: undefined,
-      recurrenceFrequency: undefined,
-      installments: undefined,
-      notes: "",
-      attachments: [],
-      tags: [],
-    },
-  });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -149,15 +137,19 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create expense");
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to create expense");
       }
 
       await queryClient.invalidateQueries({ queryKey: expensesQueryKey });
       resetModal();
       onOpenChange(false);
+      toast.success("Despesa criada com sucesso!");
     } catch (error) {
-      console.error(error);
-      // TODO: Mostrar mensagem de erro
+      console.error("Error creating expense:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao criar despesa"
+      );
     }
   };
 

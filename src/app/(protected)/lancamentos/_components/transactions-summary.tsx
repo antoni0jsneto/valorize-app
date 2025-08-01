@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
@@ -34,6 +34,9 @@ export function TransactionsSummary({
 
   return (
     <Card className="p-4">
+      <CardHeader>
+        <CardTitle>Resumo:</CardTitle>
+      </CardHeader>
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-muted-foreground">Saldo Atual</p>
