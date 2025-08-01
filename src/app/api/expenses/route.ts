@@ -22,6 +22,7 @@ export async function GET(request: Request) {
       });
     }
 
+    // Get current month transactions
     const expenses = await prisma.expense.findMany({
       where: {
         user: {
@@ -41,13 +42,32 @@ export async function GET(request: Request) {
       orderBy: [{ date: "desc" }, { createdAt: "desc" }],
     });
 
-    // Calculate summary
+    // Get previous month transactions for balance calculation
+    const previousMonthStart = new Date(startDate);
+    previousMonthStart.setMonth(previousMonthStart.getMonth() - 1);
+    previousMonthStart.setDate(1);
+    const previousMonthEnd = new Date(startDate);
+    previousMonthEnd.setDate(0);
+
+    const previousTransactions = await prisma.expense.findMany({
+      where: {
+        user: {
+          email: session.user.email,
+        },
+        date: {
+          gte: toUTCDate(previousMonthStart.toISOString()),
+          lte: toUTCDate(previousMonthEnd.toISOString()),
+        },
+      },
+    });
+
+    // Calculate current month summary
     const actualIncome = expenses
       .filter((e) => e.type === "INCOME" && e.isPaid)
       .reduce((sum, e) => sum + e.amount, 0);
 
     const expectedIncome = expenses
-      .filter((e) => e.type === "INCOME")
+      .filter((e) => e.type === "INCOME" && !e.isPaid)
       .reduce((sum, e) => sum + e.amount, 0);
 
     const actualExpenses = expenses
@@ -55,12 +75,28 @@ export async function GET(request: Request) {
       .reduce((sum, e) => sum + e.amount, 0);
 
     const expectedExpenses = expenses
-      .filter((e) => e.type === "EXPENSE")
+      .filter((e) => e.type === "EXPENSE" && !e.isPaid)
       .reduce((sum, e) => sum + e.amount, 0);
+
+    // Calculate previous month balance
+    const previousMonthIncome = previousTransactions
+      .filter((e) => e.type === "INCOME" && e.isPaid)
+      .reduce((sum, e) => sum + e.amount, 0);
+
+    const previousMonthExpenses = previousTransactions
+      .filter((e) => e.type === "EXPENSE" && e.isPaid)
+      .reduce((sum, e) => sum + e.amount, 0);
+
+    // Saldo previsto = previsão do mês anterior + receita prevista do mês atual + despesa prevista do mês atual
+    const previousMonthBalance = previousMonthIncome - previousMonthExpenses;
+    const expectedBalance =
+      Number(previousMonthBalance) +
+      Number(expectedIncome) -
+      Number(expectedExpenses);
 
     const summary = {
       currentBalance: actualIncome - actualExpenses,
-      expectedBalance: expectedIncome - expectedExpenses,
+      expectedBalance,
       actualIncome,
       expectedIncome,
       actualExpenses,
