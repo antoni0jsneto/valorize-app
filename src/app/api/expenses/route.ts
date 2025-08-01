@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
+import { toUTCDate } from "@/lib/utils";
 
 export async function GET(request: Request) {
   try {
@@ -27,8 +28,8 @@ export async function GET(request: Request) {
           email: session.user.email,
         },
         date: {
-          gte: new Date(startDate),
-          lte: new Date(endDate),
+          gte: toUTCDate(startDate),
+          lte: toUTCDate(endDate),
         },
       },
       include: {
@@ -199,7 +200,7 @@ export async function POST(req: Request) {
     const data = {
       description,
       amount: amountValue,
-      date: new Date(date),
+      date: toUTCDate(date),
       type,
       isRecurring,
       recurrenceType,

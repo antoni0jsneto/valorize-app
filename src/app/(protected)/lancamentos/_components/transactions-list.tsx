@@ -7,6 +7,7 @@ import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { categoryIcons } from "./category-icons";
 import { AccountIcon } from "@/components/bank-accounts/account-icon";
 import { format } from "date-fns";
+import { toLocalDate } from "@/lib/utils";
 import { ptBR } from "date-fns/locale";
 import type { Expense } from "./use-expenses";
 
@@ -21,7 +22,7 @@ export function TransactionsList({
 }: TransactionsListProps) {
   // Group transactions by date
   const groupedTransactions = transactions.reduce((groups, transaction) => {
-    const date = format(new Date(transaction.date), "yyyy-MM-dd");
+    const date = format(toLocalDate(transaction.date), "yyyy-MM-dd");
     if (!groups[date]) {
       groups[date] = [];
     }
@@ -48,7 +49,7 @@ export function TransactionsList({
         <div key={date}>
           <div className="bg-muted px-4 py-2 rounded-t-lg">
             <h3 className="font-medium">
-              {format(new Date(date), "dd 'de' MMMM", { locale: ptBR })}
+              {format(toLocalDate(date), "dd 'de' MMMM", { locale: ptBR })}
             </h3>
           </div>
           <Card className="rounded-t-none">

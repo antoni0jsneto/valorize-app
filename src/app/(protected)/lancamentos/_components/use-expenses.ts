@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { startOfMonth, endOfMonth } from "date-fns";
+import { toUTCDate } from "@/lib/utils";
 
 export interface Expense {
   id: string;
@@ -56,8 +57,8 @@ export interface ExpenseSummary {
 export const expensesQueryKey = ["expenses"] as const;
 
 export function useExpenses(date: Date = new Date()) {
-  const startDate = startOfMonth(date);
-  const endDate = endOfMonth(date);
+  const startDate = toUTCDate(startOfMonth(date));
+  const endDate = toUTCDate(endOfMonth(date));
 
   return useQuery<{ transactions: Expense[]; summary: ExpenseSummary }>({
     queryKey: [...expensesQueryKey, startDate.toISOString()],

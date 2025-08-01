@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/popover";
 import { CalendarIcon, Upload } from "lucide-react";
 import { TagInput } from "./tag-input";
-import { cn } from "@/lib/utils";
+import { cn, toUTCDate } from "@/lib/utils";
 import { AccountSelect } from "./account-select";
 import { toast } from "sonner";
 
@@ -83,7 +83,7 @@ const formSchema = z.object({
 const defaultValues = {
   description: "",
   amount: "",
-  date: new Date(),
+  date: toUTCDate(new Date()),
   account: "",
   category: "",
   isRecurring: false,
@@ -147,7 +147,9 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
       toast.success("Despesa criada com sucesso!");
     } catch (error) {
       console.error("Error creating expense:", error);
-      toast.error(error instanceof Error ? error.message : "Erro ao criar despesa");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao criar despesa"
+      );
     }
   };
 
@@ -250,7 +252,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                           <Calendar
                             mode="single"
                             selected={field.value}
-                            onSelect={field.onChange}
+                            onSelect={(date) => field.onChange(toUTCDate(date))}
                             disabled={(date) => date < new Date("1900-01-01")}
                             initialFocus
                             locale={ptBR}
