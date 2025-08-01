@@ -89,6 +89,27 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
   const [showAttachments, setShowAttachments] = useState(false);
   const [showTags, setShowTags] = useState(false);
 
+  const resetModal = () => {
+    form.reset({
+      description: "",
+      amount: "",
+      date: new Date(),
+      account: "",
+      category: "",
+      isRecurring: false,
+      recurrenceType: undefined,
+      recurrenceFrequency: undefined,
+      installments: undefined,
+      notes: "",
+      attachments: [],
+      tags: [],
+    });
+    form.clearErrors();
+    setShowNotes(false);
+    setShowAttachments(false);
+    setShowTags(false);
+  };
+
   const form = useForm({
     mode: "onChange",
     resolver: zodResolver(formSchema),
@@ -107,14 +128,6 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
       tags: [],
     },
   });
-
-  const resetModal = () => {
-    form.reset();
-    form.clearErrors();
-    setShowNotes(false);
-    setShowAttachments(false);
-    setShowTags(false);
-  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {

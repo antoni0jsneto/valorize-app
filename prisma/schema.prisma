@@ -159,6 +159,7 @@ model Expense {
   recurrenceFrequency String? // "daily" | "weekly" | "biweekly" | "monthly" | "bimonthly" | "quarterly" | "semiannually" | "annually"
   installments Int?
   notes       String?
+  isPaid      Boolean    @default(false)
   userId      String
   bankAccountId String?
   creditCardId  String?

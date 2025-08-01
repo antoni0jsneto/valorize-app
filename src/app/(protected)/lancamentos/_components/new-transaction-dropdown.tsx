@@ -15,8 +15,8 @@ import {
   ArrowLeftRight,
 } from "lucide-react";
 import { ExpenseModal } from "./expense-modal";
-import { IncomeModal } from "./income-modal";
-import { TransferModal } from "./transfer-modal";
+import { IncomeModal } from "./income-modal-new";
+import { TransferModal } from "./transfer-modal-new";
 
 export function NewTransactionDropdown() {
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);

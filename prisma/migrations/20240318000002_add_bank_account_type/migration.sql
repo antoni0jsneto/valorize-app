@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "BankAccount" ADD COLUMN "type" TEXT NOT NULL DEFAULT 'CHECKING';

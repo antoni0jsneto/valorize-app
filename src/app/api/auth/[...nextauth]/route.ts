@@ -62,9 +62,6 @@ export const authOptions: NextAuthOptions = {
     error: "/login", // Error code passed in query string as ?error=
   },
   callbacks: {
-    async signIn() {
-      return true;
-    },
     async redirect({ url, baseUrl }) {
       return url.startsWith(baseUrl) ? url : baseUrl + "/dashboard";
     },
@@ -86,6 +83,23 @@ export const authOptions: NextAuthOptions = {
     },
   },
   events: {
+    async createUser({ user }) {
+      console.log("Creating default wallet for new user:", user.id);
+      try {
+        await prisma.bankAccount.create({
+          data: {
+            name: "Carteira",
+            type: "WALLET",
+            icon: "wallet",
+            iconColor: "#64748b",
+            userId: user.id,
+          },
+        });
+        console.log("Default wallet created successfully");
+      } catch (error) {
+        console.error("Error creating default wallet:", error);
+      }
+    },
     async signIn(message) {
       console.log("User signed in", message);
     },

@@ -17,8 +17,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectGroup,
-  SelectLabel,
 } from "@/components/ui/select";
 import {
   Form,
@@ -49,7 +47,7 @@ import { TagInput } from "./tag-input";
 import { cn } from "@/lib/utils";
 import { AccountSelect } from "./account-select";
 
-interface ExpenseModalProps {
+interface IncomeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -81,13 +79,34 @@ const formSchema = z.object({
   tags: z.array(z.string()).default([]),
 });
 
-export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
+export function IncomeModal({ open, onOpenChange }: IncomeModalProps) {
   const queryClient = useQueryClient();
   const { data: categories, isLoading: isLoadingCategories } = useCategories();
   const { data: tags } = useTags();
   const [showNotes, setShowNotes] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [showTags, setShowTags] = useState(false);
+
+  const resetModal = () => {
+    form.reset({
+      description: "",
+      amount: "",
+      date: new Date(),
+      account: "",
+      category: "",
+      isRecurring: false,
+      recurrenceType: undefined,
+      recurrenceFrequency: undefined,
+      installments: undefined,
+      notes: "",
+      attachments: [],
+      tags: [],
+    });
+    form.clearErrors();
+    setShowNotes(false);
+    setShowAttachments(false);
+    setShowTags(false);
+  };
 
   const form = useForm({
     mode: "onChange",
@@ -108,14 +127,6 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
     },
   });
 
-  const resetModal = () => {
-    form.reset();
-    form.clearErrors();
-    setShowNotes(false);
-    setShowAttachments(false);
-    setShowTags(false);
-  };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       // Remover o prefixo "R$ " e converter para número
@@ -131,12 +142,12 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
         body: JSON.stringify({
           ...values,
           amount: numericAmount,
-          type: "EXPENSE",
+          type: "INCOME",
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create expense");
+        throw new Error("Failed to create income");
       }
 
       await queryClient.invalidateQueries({ queryKey: expensesQueryKey });
@@ -160,7 +171,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
     >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nova despesa</DialogTitle>
+          <DialogTitle>Nova receita</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -173,7 +184,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Digite a descrição da despesa"
+                      placeholder="Digite a descrição da receita"
                       {...field}
                     />
                   </FormControl>
@@ -287,7 +298,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                         ) : (
                           categories
                             ?.filter(
-                              (cat: CategoryWithIcon) => cat.type === "EXPENSE"
+                              (cat: CategoryWithIcon) => cat.type === "INCOME"
                             )
                             .map((category: CategoryWithIcon) => (
                               <SelectItem key={category.id} value={category.id}>
@@ -344,7 +355,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="fixed">Despesa Fixa</SelectItem>
+                            <SelectItem value="fixed">Receita Fixa</SelectItem>
                             <SelectItem value="installments">
                               Parcelado
                             </SelectItem>

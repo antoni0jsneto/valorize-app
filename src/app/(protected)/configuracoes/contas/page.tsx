@@ -30,10 +30,19 @@ export default async function AccountsPage() {
           email: session.user.email,
         },
       },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        icon: true,
+        iconColor: true,
+      },
       orderBy: {
         createdAt: "desc",
       },
     });
+
+    console.log("Accounts found:", accounts); // Debug log
 
     return (
       <PageContainer>

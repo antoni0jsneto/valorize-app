@@ -1,4 +1,0 @@
--- This is a placeholder migration. The default categories will be created
--- dynamically through the application when a user first accesses the
--- categories page. This ensures that the icons are properly rendered
--- and that each user gets their own set of categories. 

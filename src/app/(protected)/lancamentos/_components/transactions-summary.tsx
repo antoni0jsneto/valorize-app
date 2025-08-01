@@ -1,107 +1,97 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { HelpCircle } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 
-interface SummaryData {
-  saldoAnterior: number;
-  receitaRealizada: number;
-  receitaPrevista: number;
-  despesaRealizada: number;
-  despesaPrevista: number;
-  saldo: number;
-  previsto: number;
+interface TransactionsSummaryProps {
+  currentBalance: number;
+  expectedBalance: number;
+  actualIncome: number;
+  expectedIncome: number;
+  actualExpenses: number;
+  expectedExpenses: number;
 }
 
-const mockSummaryData: SummaryData = {
-  saldoAnterior: 15133.66,
-  receitaRealizada: 0.0,
-  receitaPrevista: 25350.0,
-  despesaRealizada: 0.0,
-  despesaPrevista: -25056.49,
-  saldo: 15133.66,
-  previsto: 6861.07,
-};
+export function TransactionsSummary({
+  currentBalance,
+  expectedBalance,
+  actualIncome,
+  expectedIncome,
+  actualExpenses,
+  expectedExpenses,
+}: TransactionsSummaryProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
 
-export function TransactionsSummary() {
   const formatCurrency = (value: number) => {
-    return value.toLocaleString("pt-BR", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: value % 1 === 0 ? 0 : 2,
+    }).format(value);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border mb-4">
-      <div className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="text-green-600 font-medium">
-              Entenda seu saldo
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-4 w-4 text-gray-400"
-            >
-              <HelpCircle className="h-3 w-3" />
-            </Button>
+    <Card className="p-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground">Saldo Atual</p>
+          <p className="text-xl font-medium">
+            {formatCurrency(currentBalance)}
+          </p>
+        </div>
+        <div>
+          <p className="text-sm text-muted-foreground">Saldo Previsto</p>
+          <p className="text-xl font-medium">
+            {formatCurrency(expectedBalance)}
+          </p>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
+
+      {isExpanded && (
+        <div className="mt-4 grid grid-cols-2 gap-4">
+          <div>
+            <div className="mb-2">
+              <p className="text-sm text-muted-foreground">Receita Realizada</p>
+              <p className="text-lg font-medium text-green-500">
+                {formatCurrency(actualIncome)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Receita Prevista</p>
+              <p className="text-lg font-medium text-green-500/70">
+                {formatCurrency(expectedIncome)}
+              </p>
+            </div>
           </div>
-
-          <div className="space-y-2 text-right min-w-[200px]">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600 text-sm">saldo anterior</span>
-              <span className="font-medium">
-                {formatCurrency(mockSummaryData.saldoAnterior)}
-              </span>
+          <div>
+            <div className="mb-2">
+              <p className="text-sm text-muted-foreground">Despesa Realizada</p>
+              <p className="text-lg font-medium text-red-500">
+                {formatCurrency(actualExpenses)}
+              </p>
             </div>
-
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600 text-sm">receita realizada</span>
-              <span className="text-green-600 font-medium">
-                {formatCurrency(mockSummaryData.receitaRealizada)}
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400 text-sm">receita prevista</span>
-              <span className="text-gray-400">
-                {formatCurrency(mockSummaryData.receitaPrevista)}
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600 text-sm">despesa realizada</span>
-              <span className="text-red-600 font-medium">
-                {formatCurrency(mockSummaryData.despesaRealizada)}
-              </span>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <span className="text-gray-400 text-sm">despesa prevista</span>
-              <span className="text-gray-400">
-                {formatCurrency(mockSummaryData.despesaPrevista)}
-              </span>
-            </div>
-
-            <div className="border-t pt-2 mt-3">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-sm font-medium">saldo</span>
-                <span className="text-blue-600 font-bold text-lg">
-                  {formatCurrency(mockSummaryData.saldo)}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <span className="text-gray-400 text-sm">previsto</span>
-                <span className="text-gray-400">
-                  {formatCurrency(mockSummaryData.previsto)}
-                </span>
-              </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Despesa Prevista</p>
+              <p className="text-lg font-medium text-red-500/70">
+                {formatCurrency(expectedExpenses)}
+              </p>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </Card>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,8 +17,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectGroup,
-  SelectLabel,
 } from "@/components/ui/select";
 import {
   Form,
@@ -36,7 +34,6 @@ import { expensesQueryKey } from "./use-expenses";
 import * as z from "zod";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { useCategories, type CategoryWithIcon } from "./use-categories";
 import { useTags } from "./use-tags";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -47,9 +44,9 @@ import {
 import { CalendarIcon, Upload } from "lucide-react";
 import { TagInput } from "./tag-input";
 import { cn } from "@/lib/utils";
-import { AccountSelect } from "./account-select";
+import { TransferAccountSelect } from "./transfer-account-select";
 
-interface ExpenseModalProps {
+interface TransferModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -65,39 +62,81 @@ const repeatOptions = [
   { value: "annually", label: "Anual" },
 ];
 
-const formSchema = z.object({
-  id: z.string().optional(),
-  description: z.string().min(1, "A descrição é obrigatória"),
-  amount: z.string().min(1, "O valor é obrigatório"),
-  date: z.date(),
-  account: z.string().min(1, "Selecione uma conta ou cartão"),
-  category: z.string().min(1, "Selecione uma categoria"),
-  isRecurring: z.boolean().default(false),
-  recurrenceType: z.string().optional(),
-  recurrenceFrequency: z.string().optional(),
-  installments: z.number().optional(),
-  notes: z.string().default(""),
-  attachments: z.array(z.custom<File>()).default([]),
-  tags: z.array(z.string()).default([]),
-});
+const formSchema = z
+  .object({
+    id: z.string().optional(),
+    description: z.string().min(1, "A descrição é obrigatória"),
+    amount: z.string().min(1, "O valor é obrigatório"),
+    date: z.date(),
+    fromAccount: z.string().min(1, "Selecione a conta de origem"),
+    toAccount: z.string().min(1, "Selecione a conta de destino"),
+    isRecurring: z.boolean().default(false),
+    recurrenceType: z.string().optional(),
+    recurrenceFrequency: z.string().optional(),
+    installments: z.number().optional(),
+    notes: z.string().default(""),
+    attachments: z.array(z.custom<File>()).default([]),
+    tags: z.array(z.string()).default([]),
+  })
+  .refine((data) => data.fromAccount !== data.toAccount, {
+    message: "A conta de origem e destino não podem ser a mesma",
+    path: ["toAccount"],
+  });
 
-export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
+export function TransferModal({ open, onOpenChange }: TransferModalProps) {
   const queryClient = useQueryClient();
-  const { data: categories, isLoading: isLoadingCategories } = useCategories();
   const { data: tags } = useTags();
   const [showNotes, setShowNotes] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [showTags, setShowTags] = useState(false);
+  const [transferCategory, setTransferCategory] = useState<string>();
+
+  // Buscar ou criar a categoria de transferência
+  useEffect(() => {
+    const fetchTransferCategory = async () => {
+      try {
+        const response = await fetch("/api/categories/transfer");
+        if (!response.ok) throw new Error("Failed to fetch transfer category");
+        const category = await response.json();
+        setTransferCategory(category.id);
+      } catch (error) {
+        console.error("Error fetching transfer category:", error);
+      }
+    };
+
+    fetchTransferCategory();
+  }, []);
+
+  const resetModal = () => {
+    form.reset({
+      description: "Transferência",
+      amount: "",
+      date: new Date(),
+      fromAccount: "",
+      toAccount: "",
+      isRecurring: false,
+      recurrenceType: undefined,
+      recurrenceFrequency: undefined,
+      installments: undefined,
+      notes: "",
+      attachments: [],
+      tags: [],
+    });
+    form.clearErrors();
+    setShowNotes(false);
+    setShowAttachments(false);
+    setShowTags(false);
+  };
 
   const form = useForm({
     mode: "onChange",
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: "",
+      description: "Transferência",
       amount: "",
       date: new Date(),
-      account: "",
-      category: "",
+      fromAccount: "",
+      toAccount: "",
       isRecurring: false,
       recurrenceType: undefined,
       recurrenceFrequency: undefined,
@@ -108,35 +147,67 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
     },
   });
 
-  const resetModal = () => {
-    form.reset();
-    form.clearErrors();
-    setShowNotes(false);
-    setShowAttachments(false);
-    setShowTags(false);
-  };
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!transferCategory) {
+      console.error("Transfer category not found");
+      return;
+    }
     try {
       // Remover o prefixo "R$ " e converter para número
       const numericAmount = parseFloat(
         values.amount.replace(/[^\d,]/g, "").replace(",", ".")
       );
 
-      const response = await fetch("/api/expenses", {
+      // Criar a saída (débito)
+      const debitResponse = await fetch("/api/expenses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...values,
+          description: values.description,
           amount: numericAmount,
+          date: values.date,
+          account: values.fromAccount,
+          category: transferCategory,
           type: "EXPENSE",
+          isRecurring: values.isRecurring,
+          recurrenceType: values.recurrenceType,
+          recurrenceFrequency: values.recurrenceFrequency,
+          installments: values.installments,
+          notes: values.notes,
+          tags: values.tags,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create expense");
+      if (!debitResponse.ok) {
+        throw new Error("Failed to create debit transaction");
+      }
+
+      // Criar a entrada (crédito)
+      const creditResponse = await fetch("/api/expenses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          description: values.description,
+          amount: numericAmount,
+          date: values.date,
+          account: values.toAccount,
+          category: transferCategory,
+          type: "INCOME",
+          isRecurring: values.isRecurring,
+          recurrenceType: values.recurrenceType,
+          recurrenceFrequency: values.recurrenceFrequency,
+          installments: values.installments,
+          notes: values.notes,
+          tags: values.tags,
+        }),
+      });
+
+      if (!creditResponse.ok) {
+        throw new Error("Failed to create credit transaction");
       }
 
       await queryClient.invalidateQueries({ queryKey: expensesQueryKey });
@@ -160,11 +231,25 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
     >
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nova despesa</DialogTitle>
+          <DialogTitle>Transferência entre contas</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <TransferAccountSelect
+              control={form.control}
+              name="fromAccount"
+              label="Saiu da conta"
+              placeholder="Selecione a conta de origem"
+            />
+
+            <TransferAccountSelect
+              control={form.control}
+              name="toAccount"
+              label="Entrou na conta"
+              placeholder="Selecione a conta de destino"
+            />
+
             <FormField
               control={form.control}
               name="description"
@@ -173,7 +258,7 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                   <FormLabel>Descrição</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Digite a descrição da despesa"
+                      placeholder="Digite a descrição da transferência"
                       {...field}
                     />
                   </FormControl>
@@ -261,60 +346,6 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <AccountSelect control={form.control} />
-
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Categoria</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione uma categoria" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {isLoadingCategories ? (
-                          <SelectItem value="loading" disabled>
-                            Carregando categorias...
-                          </SelectItem>
-                        ) : (
-                          categories
-                            ?.filter(
-                              (cat: CategoryWithIcon) => cat.type === "EXPENSE"
-                            )
-                            .map((category: CategoryWithIcon) => (
-                              <SelectItem key={category.id} value={category.id}>
-                                <div className="flex items-center gap-2">
-                                  {category.icon && (
-                                    <div
-                                      className="h-6 w-6 rounded-full flex items-center justify-center"
-                                      style={{
-                                        backgroundColor: category.color,
-                                      }}
-                                    >
-                                      <category.icon className="h-4 w-4 text-white" />
-                                    </div>
-                                  )}
-                                  <span>{category.name}</span>
-                                </div>
-                              </SelectItem>
-                            ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label htmlFor="repeat">Repetir</Label>
@@ -344,7 +375,9 @@ export function ExpenseModal({ open, onOpenChange }: ExpenseModalProps) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="fixed">Despesa Fixa</SelectItem>
+                            <SelectItem value="fixed">
+                              Transferência Fixa
+                            </SelectItem>
                             <SelectItem value="installments">
                               Parcelado
                             </SelectItem>

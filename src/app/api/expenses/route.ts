@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -11,10 +11,24 @@ export async function GET() {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const { searchParams } = new URL(request.url);
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+
+    if (!startDate || !endDate) {
+      return new NextResponse("Start date and end date are required", {
+        status: 400,
+      });
+    }
+
     const expenses = await prisma.expense.findMany({
       where: {
         user: {
           email: session.user.email,
+        },
+        date: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
         },
       },
       include: {
@@ -23,12 +37,39 @@ export async function GET() {
         bankAccount: true,
         creditCard: true,
       },
-      orderBy: {
-        date: "desc",
-      },
+      orderBy: [{ date: "desc" }, { createdAt: "desc" }],
     });
 
-    return NextResponse.json(expenses);
+    // Calculate summary
+    const actualIncome = expenses
+      .filter((e) => e.type === "INCOME" && e.isPaid)
+      .reduce((sum, e) => sum + e.amount, 0);
+
+    const expectedIncome = expenses
+      .filter((e) => e.type === "INCOME")
+      .reduce((sum, e) => sum + e.amount, 0);
+
+    const actualExpenses = expenses
+      .filter((e) => e.type === "EXPENSE" && e.isPaid)
+      .reduce((sum, e) => sum + e.amount, 0);
+
+    const expectedExpenses = expenses
+      .filter((e) => e.type === "EXPENSE")
+      .reduce((sum, e) => sum + e.amount, 0);
+
+    const summary = {
+      currentBalance: actualIncome - actualExpenses,
+      expectedBalance: expectedIncome - expectedExpenses,
+      actualIncome,
+      expectedIncome,
+      actualExpenses,
+      expectedExpenses,
+    };
+
+    return NextResponse.json({
+      transactions: expenses,
+      summary,
+    });
   } catch (error) {
     console.error("[EXPENSES_GET]", error);
     return new NextResponse("Internal error", { status: 500 });
@@ -44,7 +85,6 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    console.log("Request body:", body);
 
     const {
       description,
@@ -61,9 +101,6 @@ export async function POST(req: Request) {
       tags,
     } = body;
 
-    console.log("Account ID:", accountId);
-    console.log("Category ID:", categoryId);
-
     const user = await prisma.user.findUnique({
       where: {
         email: session.user.email,
@@ -74,7 +111,7 @@ export async function POST(req: Request) {
       return new NextResponse("User not found", { status: 404 });
     }
 
-    // Validar se a conta/cartão existe e pertence ao usuário
+    // Validate account/card
     let bankAccountId: string | undefined;
     let creditCardId: string | undefined;
 
@@ -106,7 +143,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // Validar se a categoria existe e pertence ao usuário
+    // Validate category
     const category = await prisma.category.findFirst({
       where: {
         id: categoryId,
@@ -118,13 +155,13 @@ export async function POST(req: Request) {
       return new NextResponse("Category not found", { status: 404 });
     }
 
-    // Preparar os dados
+    // Prepare data
     const amountValue =
       typeof amount === "string"
         ? parseFloat(amount.replace(/[^\d,]/g, "").replace(",", "."))
         : amount;
 
-    // Validar campos obrigatórios
+    // Validate required fields
     if (!description) {
       return new NextResponse("Description is required", { status: 400 });
     }
@@ -151,6 +188,7 @@ export async function POST(req: Request) {
       recurrenceFrequency,
       installments: installments ? parseInt(String(installments)) : undefined,
       notes,
+      isPaid: false,
       user: {
         connect: {
           id: user.id,
@@ -188,9 +226,6 @@ export async function POST(req: Request) {
         : {}),
     };
 
-    console.log("Prepared data:", data);
-
-    // Criar a despesa
     const expense = await prisma.expense.create({
       data,
       include: {
