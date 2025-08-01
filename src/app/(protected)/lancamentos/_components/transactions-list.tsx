@@ -4,6 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
+import { categoryIcons } from "./category-icons";
+import { AccountIcon } from "@/components/bank-accounts/account-icon";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { Expense } from "./use-expenses";
@@ -64,12 +66,12 @@ export function TransactionsList({
                       className="h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: transaction.category.color }}
                     >
-                      <div
-                        className="h-5 w-5 text-white"
-                        dangerouslySetInnerHTML={{
-                          __html: transaction.category.icon,
-                        }}
-                      />
+                      {(() => {
+                        const Icon =
+                          categoryIcons[transaction.category.icon] ||
+                          categoryIcons.receipt;
+                        return <Icon className="h-5 w-5 text-white" />;
+                      })()}
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -88,12 +90,11 @@ export function TransactionsList({
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         {paymentMethod && (
                           <div className="flex items-center gap-1.5">
-                            <div
+                            <AccountIcon
+                              icon={paymentMethod.icon}
+                              iconColor={paymentMethod.iconColor}
+                              name={paymentMethod.name}
                               className="h-4 w-4"
-                              style={{ color: paymentMethod.iconColor }}
-                              dangerouslySetInnerHTML={{
-                                __html: paymentMethod.icon,
-                              }}
                             />
                             <span>{paymentMethod.name}</span>
                           </div>
